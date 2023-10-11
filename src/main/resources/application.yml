@@ -1,0 +1,27 @@
+server:
+  port: 8086
+spring:
+  datasource:
+    url: jdbc:oracle:thin:@localhost:1521/xe
+    driver-class-name: oracle.jdbc.driver.OracleDriver
+    username: REDACTED_USERNAME
+    password: REDACTED_PASSWORD
+  mail:
+    email: user@example.com
+    host: smtp.gmail.com
+    port: 465
+    protocol: smtps
+    username: REDACTED_USERNAME
+    password: REDACTED_PASSWORD
+  jpa:
+    hibernate:
+      ddl-auto: create-drop
+    show-sql: true
+    database-platform: org.hibernate.dialect.Oracle12cDialect
+  main:
+    allow-bean-definition-overriding: true
+  profiles:
+    active: dev
+jwt:
+  secret-key: REDACTED_JWT_SECRET
+  issuer: http://localhost
