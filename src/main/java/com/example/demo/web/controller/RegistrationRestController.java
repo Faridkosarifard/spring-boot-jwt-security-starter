@@ -1,13 +1,19 @@
 package com.example.demo.web.controller;
 
+import com.example.demo.common.MailHtmlContent;
 import com.example.demo.persistence.model.Privilege;
 import com.example.demo.persistence.model.Role;
 import com.example.demo.persistence.model.User;
 import com.example.demo.registration.OnRegistrationCompleteEvent;
 import com.example.demo.service.IUserService;
+import com.example.demo.sping.ISecurityUserService;
+import com.example.demo.web.dto.PasswordDto;
 import com.example.demo.web.dto.UserDto;
 import com.example.demo.web.util.GenericResponse;
+import jakarta.mail.internet.MimeMessage;
 import jakarta.servlet.http.HttpServletRequest;
+import jakarta.validation.Valid;
+import lombok.SneakyThrows;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.context.MessageSource;
@@ -20,13 +26,12 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.ui.ModelMap;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.servlet.ModelAndView;
 
 import java.io.UnsupportedEncodingException;
-import java.util.Collection;
-import java.util.List;
-import java.util.Locale;
-import java.util.UUID;
+import java.util.*;
 import java.util.stream.Collectors;
 
 /**
@@ -42,6 +47,9 @@ public class RegistrationRestController {
 
     @Autowired
     private MessageSource messages;
+
+    @Autowired
+    private ISecurityUserService securityUserService;
 
     @Autowired
     private JavaMailSender mailSender;
@@ -66,7 +74,6 @@ public class RegistrationRestController {
 
         User registered = userService.registerNewUserAccount(accountDto);
         eventPublisher.publishEvent(new OnRegistrationCompleteEvent(registered, request.getLocale(), getAppUrl(request)));
-        //TODO REDIRECT TO RESET PASSWORD URL
         return new GenericResponse("success");
     }
 
@@ -77,9 +84,11 @@ public class RegistrationRestController {
             final User user = userService.getUser(token);
             authWithoutPassword(user);
             System.out.println("OK");
+            //TODO REDIRECT TO HOME PAGE
             return HttpStatus.OK;
         }
         System.out.println("Not ok ");
+        //TODO REDIRECT TO LOGIN PAGE
         return HttpStatus.NOT_ACCEPTABLE;
     }
 
@@ -94,17 +103,59 @@ public class RegistrationRestController {
         return new GenericResponse("ٍEmail Sent");
     }
 
-    private SimpleMailMessage constructResetTokenEmail(final String contextPath, final String token, final User user) {
-        final String url = contextPath + "/user/changePassword?token=" + token;
-        final String message = "Reset Password";
-        return constructEmail("Reset Password", message + " \r\n" + url, user);
+    @GetMapping("/user/forgetPassword")
+    public Object showChangePasswordPage(final ModelMap model, @RequestBody final String token) {
+        final String result = securityUserService.validatePasswordResetToken(token);
+        if(result != null) {
+            String messageKey = "auth.message." + result;
+            model.addAttribute("messageKey", messageKey);
+            //TODO REDIRECT TO ERROR PAGE AND SEND THE MSG TO UI
+            return new ModelAndView("redirect:/login", model);
+        } else {
+            model.addAttribute("token", token);
+            //TODO REDIRECT TO CHANGE PASSWORD PAGE WITH TOKEN
+            return new ModelAndView("redirect:/updatePassword");
+        }
     }
 
-    private SimpleMailMessage constructEmail(String subject, String body, User user) {
-        final SimpleMailMessage email = new SimpleMailMessage();
+
+    @PostMapping("/user/savePassword")
+    public GenericResponse savePassword(final Locale locale, @RequestBody PasswordDto passwordDto) {
+        final String result = securityUserService.validatePasswordResetToken(passwordDto.getToken());
+        if(result != null) {
+            return new GenericResponse("NULL/expire");
+        }
+        Optional<User> user = userService.getUserByPasswordResetToken(passwordDto.getToken());
+        if(user.isPresent()) {
+            userService.changeUserPassword(user.get(), passwordDto.getNewPassword());
+            return new GenericResponse("Password Successfully change");
+        } else {
+            return new GenericResponse("token invalid");
+        }
+    }
+
+    @GetMapping("/user/changePassword")
+    public Object changePassword( @RequestBody PasswordDto passwordDto){
+        User user =  userService.findUserByEmail(passwordDto.getEmail());
+        if (!userService.checkIfValidOldPassword(user, passwordDto.getOldPassword())) {
+            System.out.println("not match");
+        }
+        userService.changeUserPassword(user, passwordDto.getNewPassword());
+        return "succ";
+    }
+
+
+    private MimeMessage constructResetTokenEmail(final String contextPath, final String token, final User user) {
+        final String url = contextPath + "/user/changePassword?token=" + token;
+        final String message = MailHtmlContent.getInstance().forgetPasswordHtmlContent(user.getFirstName(),user.getLastName(),url);
+        return constructEmail("فراموشی رمز عبور", message , user);
+    }
+    @SneakyThrows
+    private MimeMessage constructEmail(String subject, String body, User user) {
+        MimeMessage email = mailSender.createMimeMessage();
+        email.setRecipients(MimeMessage.RecipientType.TO, user.getEmail());
         email.setSubject(subject);
-        email.setText(body);
-        email.setTo(user.getEmail());
+        email.setContent(body, "text/html; charset=utf-8");
         email.setFrom(env.getProperty("support.email"));
         return email;
     }
