@@ -1,10 +1,12 @@
 package com.example.demo.web.controller;
 
 import com.example.demo.common.MailHtmlContent;
+import com.example.demo.common.TokenProvider;
 import com.example.demo.persistence.model.Privilege;
 import com.example.demo.persistence.model.Role;
 import com.example.demo.persistence.model.User;
 import com.example.demo.registration.OnRegistrationCompleteEvent;
+import com.example.demo.service.CustomAuthenticationService;
 import com.example.demo.service.IUserService;
 import com.example.demo.sping.ISecurityUserService;
 import com.example.demo.web.dto.PasswordDto;
@@ -12,15 +14,14 @@ import com.example.demo.web.dto.UserDto;
 import com.example.demo.web.util.GenericResponse;
 import jakarta.mail.internet.MimeMessage;
 import jakarta.servlet.http.HttpServletRequest;
-import jakarta.validation.Valid;
 import lombok.SneakyThrows;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.context.MessageSource;
 import org.springframework.core.env.Environment;
 import org.springframework.http.HttpStatus;
-import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;
+import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
@@ -50,6 +51,10 @@ public class RegistrationRestController {
 
     @Autowired
     private ISecurityUserService securityUserService;
+    private final CustomAuthenticationService customAuthenticationService;
+    private final TokenProvider tokenProvider;
+    @Autowired
+    private final AuthenticationManager authenticationManager;
 
     @Autowired
     private JavaMailSender mailSender;
@@ -60,9 +65,12 @@ public class RegistrationRestController {
     @Autowired
     private Environment env;
 
-    public RegistrationRestController(IUserService userService, MessageSource messages, JavaMailSender mailSender, ApplicationEventPublisher eventPublisher, Environment env) {
+    public RegistrationRestController(IUserService userService, MessageSource messages, CustomAuthenticationService customAuthenticationService, TokenProvider tokenProvider, AuthenticationManager authenticationManager, JavaMailSender mailSender, ApplicationEventPublisher eventPublisher, Environment env) {
         this.userService = userService;
         this.messages = messages;
+        this.customAuthenticationService = customAuthenticationService;
+        this.tokenProvider = tokenProvider;
+        this.authenticationManager = authenticationManager;
         this.mailSender = mailSender;
         this.eventPublisher = eventPublisher;
         this.env = env;
@@ -71,7 +79,6 @@ public class RegistrationRestController {
     @PostMapping("/user/registration")
     public Object registerUserAccount(@RequestBody final UserDto accountDto, final HttpServletRequest request) {
         //LOGGER.debug("Registering user account with information: {}", accountDto);
-
         User registered = userService.registerNewUserAccount(accountDto);
         eventPublisher.publishEvent(new OnRegistrationCompleteEvent(registered, request.getLocale(), getAppUrl(request)));
         return new GenericResponse("success");
@@ -142,6 +149,12 @@ public class RegistrationRestController {
         }
         userService.changeUserPassword(user, passwordDto.getNewPassword());
         return "succ";
+    }
+
+    @GetMapping("/login")//change method type, after learning (@PostMapping)
+    public String login(@ModelAttribute User userEntity) {
+        customAuthenticationService.authenticateUser(userEntity.getUserName(), userEntity.getPassword());
+        return tokenProvider.getToken(userEntity.getUserName(), userEntity.getRoles().toString());
     }
 
 

@@ -28,7 +28,7 @@ public class MailHtmlContent {
                 "</head>\n" +
                 "<body><p dir=\"rtl\">\n" +
                 "</p><table border=\"0\" cellpadding=\"0\" cellspacing=\"0\" width=\"100%\" style=\"table-layout:fixed;background-color:#f9f9f9\" id=\"bodyTable\">\n" +
-                "\t<tbody>\n" +
+                " <tbody>\n" +
                 "\t\t<tr>\n" +
                 "\t\t\t<td style=\"padding-right:10px;padding-left:10px;\" align=\"center\" valign=\"top\" id=\"bodyCell\">\n" +
                 "\t\t\t\t<table border=\"0\" cellpadding=\"0\" cellspacing=\"0\" width=\"100%\" class=\"wrapperWebview\" style=\"max-width:600px\">\n" +

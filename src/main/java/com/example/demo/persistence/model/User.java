@@ -29,6 +29,8 @@ public class User {
 
     private String lastName;
 
+    private String userName;
+
     private String email;
 
     @Column(length = 60)
@@ -55,6 +57,7 @@ public class User {
         this.secret = Base32.random();
         this.enabled = false;
     }
+
 
     @Override
     public boolean equals(final Object obj) {
