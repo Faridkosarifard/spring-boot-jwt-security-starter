@@ -4,6 +4,7 @@ import com.example.demo.persistence.model.PasswordResetToken;
 import com.example.demo.persistence.model.User;
 import com.example.demo.persistence.model.VerificationToken;
 import com.example.demo.web.dto.UserDto;
+import org.springframework.security.core.userdetails.UserDetailsService;
 
 import java.io.UnsupportedEncodingException;
 import java.util.List;
@@ -48,6 +49,5 @@ public interface IUserService {
     String validateVerificationToken(String token);
 
     User updateUser2FA(boolean use2FA);
-
 
 }

@@ -34,6 +34,8 @@ public class UserDto {
     @Size(min=11,max = 11)
     private String phoneNumber;
 
+    private String userName;
+
     private boolean isUsing2FA;
 
     public String getEmail() {
@@ -45,6 +47,15 @@ public class UserDto {
     }
 
     private Integer role;
+
+    public String getUserName() {
+        return userName;
+    }
+
+    public UserDto setUserName(String userName) {
+        this.userName = userName;
+        return this;
+    }
 
     public Integer getRole() {
         return role;

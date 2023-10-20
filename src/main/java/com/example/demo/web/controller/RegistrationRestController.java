@@ -53,6 +53,7 @@ public class RegistrationRestController {
     private ISecurityUserService securityUserService;
     private final CustomAuthenticationService customAuthenticationService;
     private final TokenProvider tokenProvider;
+
     @Autowired
     private final AuthenticationManager authenticationManager;
 
@@ -151,10 +152,10 @@ public class RegistrationRestController {
         return "succ";
     }
 
-    @GetMapping("/login")//change method type, after learning (@PostMapping)
-    public String login(@ModelAttribute User userEntity) {
-        customAuthenticationService.authenticateUser(userEntity.getUserName(), userEntity.getPassword());
-        return tokenProvider.getToken(userEntity.getUserName(), userEntity.getRoles().toString());
+    @GetMapping("/login")
+    public String login(@RequestBody UserDto userEntity) {
+        authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(userEntity.getUserName(), userEntity.getPassword()));
+        return tokenProvider.getToken(userEntity.getUserName());
     }
 
 

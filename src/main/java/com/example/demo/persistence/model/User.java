@@ -3,6 +3,7 @@ package com.example.demo.persistence.model;
 import jakarta.persistence.*;
 import lombok.*;
 import org.jboss.aerogear.security.otp.api.Base32;
+import org.springframework.security.core.userdetails.UserDetails;
 
 import java.util.Collection;
 import java.util.Date;
@@ -15,11 +16,10 @@ import java.util.Date;
  */
 @Entity
 @Table(name = "USER_ACCOUNT")
-@Getter
-@Setter
+@Data
 @Builder
 @AllArgsConstructor
-public class User {
+public class User  {
     @Id
     @Column(unique = true, nullable = false)
     @GeneratedValue(strategy = GenerationType.AUTO)
@@ -86,6 +86,7 @@ public class User {
                 .append(", lastName=").append(lastName)
                 .append(", email=").append(email)
                 .append(", enabled=").append(enabled)
+                .append(", userName=").append(userName)
                 .append(", isUsing2FA=").append(isUsing2FA)
                 .append(", secret=").append(secret)
                 .append(", roles=").append(roles)

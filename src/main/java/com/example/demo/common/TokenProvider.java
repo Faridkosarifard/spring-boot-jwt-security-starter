@@ -24,11 +24,10 @@ public class TokenProvider {
     @Value("${jwt.issuer}")
     private String issuer;
 
-    public String getToken(String username,String roleName) throws IllegalArgumentException, JWTCreationException {
+    public String getToken(String username) throws IllegalArgumentException, JWTCreationException {
         log.info("getToken");
         return JWT.create()
                 .withClaim("username", username)
-                .withClaim("roleName", roleName)
                 .withIssuedAt(new Date())
                 .withIssuer(issuer)
                 .sign(Algorithm.HMAC256(secretKey));

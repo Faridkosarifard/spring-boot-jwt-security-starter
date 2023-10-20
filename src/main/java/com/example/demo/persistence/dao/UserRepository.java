@@ -3,6 +3,8 @@ package com.example.demo.persistence.dao;
 import com.example.demo.persistence.model.User;
 import org.springframework.data.jpa.repository.JpaRepository;
 
+import java.util.Optional;
+
 /**
  * demo
  * Created by Farid Kosarifard
@@ -14,4 +16,6 @@ public interface UserRepository extends JpaRepository<User,Long> {
 
     @Override
     void delete(User user);
+
+    User findByUserName(String userName);
 }

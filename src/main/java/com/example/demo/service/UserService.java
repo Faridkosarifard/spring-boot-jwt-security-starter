@@ -5,6 +5,7 @@ import com.example.demo.persistence.dao.RoleRepository;
 import com.example.demo.persistence.dao.UserRepository;
 import com.example.demo.persistence.dao.VerificationTokenRepository;
 import com.example.demo.persistence.model.PasswordResetToken;
+
 import com.example.demo.persistence.model.User;
 import com.example.demo.persistence.model.VerificationToken;
 import com.example.demo.web.dto.UserDto;
@@ -14,8 +15,12 @@ import org.springframework.core.env.Environment;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.session.SessionRegistry;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -31,7 +36,7 @@ import java.util.*;
  */
 @Service
 @Transactional
-public class UserService implements IUserService {
+public class UserService implements IUserService, UserDetailsService {
     @Autowired
     private UserRepository userRepository;
 
@@ -69,6 +74,7 @@ public class UserService implements IUserService {
         user.setEmail(accountDto.getEmail());
         user.setBirthDay(accountDto.getBirthDay());
         user.setPhoneNumber(accountDto.getPhoneNumber());
+        user.setUserName(accountDto.getUserName());
         user.setUsing2FA(accountDto.isUsing2FA());
         user.setRoles(Collections.singletonList(roleRepository.findByName("ROLE_USER")));
         return userRepository.save(user);
@@ -198,5 +204,9 @@ public class UserService implements IUserService {
         return currentUser;
     }
 
-
+    @Override
+    public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
+        User userEntity = userRepository.findByUserName(username);
+        return new org.springframework.security.core.userdetails.User(username, userEntity.getPassword(), List.of(new SimpleGrantedAuthority("ROLE_ADMIN")));
+    }
 }
