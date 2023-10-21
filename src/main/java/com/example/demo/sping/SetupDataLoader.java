@@ -57,11 +57,11 @@ public class SetupDataLoader implements ApplicationListener<ContextRefreshedEven
 
         final List<Privilege> adminPrivileges = new ArrayList<>(Arrays.asList(readPrivilege, writePrivilege, passwordPrivilege));
         final List<Privilege> userPrivileges = new ArrayList<>(Arrays.asList(readPrivilege, passwordPrivilege));
-        final Role adminRole = createRoleIfNotFound("ADMIN", adminPrivileges);
-        createRoleIfNotFound("USER", userPrivileges);
+        final Role adminRole = createRoleIfNotFound("ROLE_ADMIN", adminPrivileges);
+        createRoleIfNotFound("ROLE_USER", userPrivileges);
 
         // == create initial user
-        createUserIfNotFound("test@test.com", "Test", "Test", "test", new ArrayList<>(Arrays.asList(adminRole)));
+        createUserIfNotFound("test@test.com", "Test", "Test", "test","test@12345", new ArrayList<>(Arrays.asList(adminRole)));
 
         alreadySetup = true;
     }
@@ -88,7 +88,7 @@ public class SetupDataLoader implements ApplicationListener<ContextRefreshedEven
     }
 
     @Transactional
-    public User createUserIfNotFound(final String email, final String firstName, final String lastName, final String password, final Collection<Role> roles) {
+    public User createUserIfNotFound(final String email, final String firstName, final String lastName, final String userName,final String password, final Collection<Role> roles) {
         User user = userRepository.findByEmail(email);
         if (user == null) {
             user = new User();
@@ -96,6 +96,7 @@ public class SetupDataLoader implements ApplicationListener<ContextRefreshedEven
             user.setLastName(lastName);
             user.setPassword(passwordEncoder.encode(password));
             user.setEmail(email);
+            user.setUserName(userName);
             user.setEnabled(true);
         }
         user.setRoles(roles);

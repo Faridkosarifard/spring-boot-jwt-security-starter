@@ -1,8 +1,10 @@
 package com.example.demo.persistence.dao;
 
+import com.example.demo.persistence.model.Role;
 import com.example.demo.persistence.model.User;
 import org.springframework.data.jpa.repository.JpaRepository;
 
+import java.util.Collection;
 import java.util.Optional;
 
 /**
@@ -18,4 +20,5 @@ public interface UserRepository extends JpaRepository<User,Long> {
     void delete(User user);
 
     User findByUserName(String userName);
+
 }

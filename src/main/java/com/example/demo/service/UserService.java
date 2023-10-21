@@ -6,6 +6,7 @@ import com.example.demo.persistence.dao.UserRepository;
 import com.example.demo.persistence.dao.VerificationTokenRepository;
 import com.example.demo.persistence.model.PasswordResetToken;
 
+import com.example.demo.persistence.model.Role;
 import com.example.demo.persistence.model.User;
 import com.example.demo.persistence.model.VerificationToken;
 import com.example.demo.web.dto.UserDto;
@@ -15,6 +16,7 @@ import org.springframework.core.env.Environment;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.session.SessionRegistry;
@@ -27,6 +29,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.io.UnsupportedEncodingException;
 import java.util.*;
+import java.util.stream.Collectors;
 
 /**
  * demo
@@ -92,7 +95,7 @@ public class UserService implements IUserService, UserDetailsService {
         user.setPhoneNumber(accountDto.getPhoneNumber());
         user.setUserName(accountDto.getUserName());
         user.setUsing2FA(accountDto.isUsing2FA());
-        user.setRoles(Collections.singletonList(roleRepository.findByName("USER")));
+        user.setRoles(Collections.singletonList(roleRepository.findByName("ROLE_USER")));
         return userRepository.save(user);
     }
     private boolean emailExists(final String email) {
@@ -222,7 +225,14 @@ public class UserService implements IUserService, UserDetailsService {
 
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
+
         User userEntity = userRepository.findByUserName(username);
-        return new org.springframework.security.core.userdetails.User(username, userEntity.getPassword(), List.of(new SimpleGrantedAuthority("ROLE_ADMIN")));
+
+        Collection<Role> userRoles = userEntity.getRoles();
+        List<GrantedAuthority> authorities = userRoles.stream()
+                .map(role -> new SimpleGrantedAuthority(role.getName()))
+                .collect(Collectors.toList());
+
+        return new org.springframework.security.core.userdetails.User(username, userEntity.getPassword(), authorities);
     }
 }
