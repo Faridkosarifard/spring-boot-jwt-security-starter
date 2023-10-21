@@ -1,0 +1,24 @@
+For registration->
+url: http://localhost:8086/user/registration
+{
+    "firstName": "Jane",
+    "lastName": "Doe",
+    "userName": "farid",
+    "password": "example-password",
+    "email": "user@example.com",
+    "isUsing2FA": "false"
+}
+
+for login ->
+url: http://localhost:8086/login
+
+{
+
+    "userName": "farid",
+    "password": "example-password"
+
+}
+
+for test verifying ->
+url: http://localhost:8086/users/
+paste token in Authorization section in Postman

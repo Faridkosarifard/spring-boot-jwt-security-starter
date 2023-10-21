@@ -92,7 +92,7 @@ public class UserService implements IUserService, UserDetailsService {
         user.setPhoneNumber(accountDto.getPhoneNumber());
         user.setUserName(accountDto.getUserName());
         user.setUsing2FA(accountDto.isUsing2FA());
-        user.setRoles(Collections.singletonList(roleRepository.findByName("ROLE_USER")));
+        user.setRoles(Collections.singletonList(roleRepository.findByName("USER")));
         return userRepository.save(user);
     }
     private boolean emailExists(final String email) {

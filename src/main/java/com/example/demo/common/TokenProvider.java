@@ -25,14 +25,14 @@ public class TokenProvider {
 
     @Autowired
     private UserRepository userRepository;
-    private String secretKey;
     //TODO CHANGE THE ISSUER AT THE END
     @Value("${jwt.issuer}")
     private String issuer;
 
     public String getToken(String username) throws IllegalArgumentException, JWTCreationException {
         log.info("getToken");
-        secretKey = userRepository.findByUserName(username).getSecret();
+        String secretKey = userRepository.findByUserName(username).getSecret();
+        System.out.println(secretKey);
         return JWT.create()
                 .withClaim("username", username)
                 .withIssuedAt(new Date())
@@ -42,6 +42,8 @@ public class TokenProvider {
 
     public String verifyToken(String token) throws JWTVerificationException {
         log.info("verifyToken");
+        String userName= JWT.decode(token).getClaim("username").asString();
+        String secretKey = userRepository.findByUserName(userName).getSecret();
         return JWT.require(Algorithm.HMAC256(secretKey))
                 .withIssuer(issuer)
                 .build().verify(token).getClaim("username").asString();

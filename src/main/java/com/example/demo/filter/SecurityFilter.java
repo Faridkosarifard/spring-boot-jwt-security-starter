@@ -43,20 +43,16 @@ public class SecurityFilter extends OncePerRequestFilter {
 
     @Override
     protected void doFilterInternal(jakarta.servlet.http.HttpServletRequest request, jakarta.servlet.http.HttpServletResponse response, jakarta.servlet.FilterChain filterChain) throws jakarta.servlet.ServletException, IOException {
-            if (request.getHeader("Authorization") != null){
-                try {
-                    log.info("doFilterInternal");
-                    String token = request.getHeader("Authorization").substring("Bearer ".length());
-                    String username = tokenProvider.verifyToken(token);
-                    UserDetails userDetails = userService.loadUserByUsername(username);
-                    SecurityContextHolder.getContext().setAuthentication(new UsernamePasswordAuthenticationToken(username, userDetails.getPassword(), userDetails.getAuthorities()));
-                } catch (Exception e) {
-                    log.warn("request with token error: {}", e.getMessage());
-                } finally {
-                    filterChain.doFilter(request, response);
-                }
-            }else {
-                filterChain.doFilter(request, response);
-            }
+        try {
+            log.info("doFilterInternal");
+            String token = request.getHeader("Authorization").substring("Bearer ".length());
+            String username = tokenProvider.verifyToken(token);
+            UserDetails userDetails = userService.loadUserByUsername(username);
+            SecurityContextHolder.getContext().setAuthentication(new UsernamePasswordAuthenticationToken(username, userDetails.getPassword(), userDetails.getAuthorities()));
+        } catch (Exception e) {
+            log.warn("request with token error: {}", e.getMessage());
+        } finally {
+            filterChain.doFilter(request, response);
+        }
     }
 }

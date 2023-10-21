@@ -33,7 +33,12 @@ import static org.springframework.security.config.http.SessionCreationPolicy.STA
 public class SecSecurityConfig  {
 
 
-
+    private  UserService userService;
+    @Lazy
+    @Autowired
+    public void setUserService(UserService userService) {
+        this.userService = userService;
+    }
 
     @Bean
     public SecurityFilter securityFilter() {
@@ -63,9 +68,9 @@ public class SecSecurityConfig  {
                             .requestMatchers("/api/**")
                             .authenticated()
                             .requestMatchers("/admin/**")
-                            .hasRole("ROLE_ADMIN")
+                            .hasRole("ADMIN")
                             .requestMatchers("/users/**")
-                            .hasRole("ROLE_USER")
+                            .hasRole("USER")
                             .anyRequest().permitAll();
 
                 });
@@ -82,11 +87,7 @@ public class SecSecurityConfig  {
             AuthenticationConfiguration authConfig) throws Exception {
         return authConfig.getAuthenticationManager();
     }
-    private  UserService userService;
-    @Autowired
-    public void setUserService(UserService userService) {
-        this.userService = userService;
-    }
+
     @Bean
     public AuthenticationProvider authenticationProvider() {
         DaoAuthenticationProvider authProvider = new DaoAuthenticationProvider();

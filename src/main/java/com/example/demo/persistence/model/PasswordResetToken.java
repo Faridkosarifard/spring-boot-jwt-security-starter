@@ -5,6 +5,7 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.io.Serializable;
 import java.util.Calendar;
 import java.util.Date;
 
@@ -16,7 +17,7 @@ import java.util.Date;
  */
 @Entity
 
-public class PasswordResetToken {
+public class PasswordResetToken implements Serializable {
     private static final int EXPIRATION = 60 * 24;
 
     @Id

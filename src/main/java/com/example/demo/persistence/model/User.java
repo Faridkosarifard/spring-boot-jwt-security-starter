@@ -5,6 +5,7 @@ import lombok.*;
 import org.jboss.aerogear.security.otp.api.Base32;
 import org.springframework.security.core.userdetails.UserDetails;
 
+import java.io.Serializable;
 import java.util.Collection;
 import java.util.Date;
 
@@ -19,7 +20,7 @@ import java.util.Date;
 @Data
 @Builder
 @AllArgsConstructor
-public class User  {
+public class User implements Serializable {
     @Id
     @Column(unique = true, nullable = false)
     @GeneratedValue(strategy = GenerationType.AUTO)

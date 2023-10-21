@@ -3,6 +3,7 @@ package com.example.demo.persistence.model;
 import jakarta.persistence.*;
 import lombok.*;
 
+import java.io.Serializable;
 import java.util.Calendar;
 import java.util.Date;
 
@@ -13,7 +14,7 @@ import java.util.Date;
  * Time: 2:12 PM
  */
 @Entity
-public class VerificationToken {
+public class VerificationToken implements Serializable {
     private static final int EXPIRATION = 60 * 24;
 
     @Id
