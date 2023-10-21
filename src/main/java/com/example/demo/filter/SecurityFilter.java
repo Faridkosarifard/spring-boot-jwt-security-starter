@@ -20,26 +20,15 @@ import java.io.IOException;
 @Controller
 @Slf4j
 public class SecurityFilter extends OncePerRequestFilter {
-    private static final   SecurityFilter SECURITY_FILTER= new SecurityFilter();
 
-    public SecurityFilter() {
-    }
+    private final UserService userService;
+    private final TokenProvider tokenProvider;
 
-    public static SecurityFilter getInstance(){
-        return SECURITY_FILTER;
-    }
-
-    private  TokenProvider tokenProvider;
-
-    private  UserService userService;
-    @Autowired
-    public void setTokenProvider(TokenProvider tokenProvider) {
+    public SecurityFilter(UserService userService, TokenProvider tokenProvider) {
+        this.userService = userService;
         this.tokenProvider = tokenProvider;
     }
-    @Autowired
-    public void setUserService(UserService userService) {
-        this.userService = userService;
-    }
+
 
     @Override
     protected void doFilterInternal(jakarta.servlet.http.HttpServletRequest request, jakarta.servlet.http.HttpServletResponse response, jakarta.servlet.FilterChain filterChain) throws jakarta.servlet.ServletException, IOException {

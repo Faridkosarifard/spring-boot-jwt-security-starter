@@ -36,14 +36,14 @@ public class SecSecurityConfig  {
     private  UserService userService;
     @Lazy
     @Autowired
+    private SecurityFilter securityFilter;
+    @Lazy
+    @Autowired
     public void setUserService(UserService userService) {
         this.userService = userService;
     }
 
-    @Bean
-    public SecurityFilter securityFilter() {
-        return new SecurityFilter();
-    }
+
 
     @Bean
     public PasswordEncoder passwordEncoder() {
@@ -58,7 +58,7 @@ public class SecSecurityConfig  {
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity httpSecurity) throws Exception {
         httpSecurity.authenticationProvider(authenticationProvider()).addFilterBefore(
-                SecurityFilter.getInstance(), UsernamePasswordAuthenticationFilter.class);
+                securityFilter, UsernamePasswordAuthenticationFilter.class);
         httpSecurity.csrf((configurer)->{
             configurer.disable();
         });
