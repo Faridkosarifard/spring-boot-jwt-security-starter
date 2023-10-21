@@ -4,6 +4,7 @@ import com.example.demo.common.MailHtmlContent;
 import com.example.demo.persistence.model.User;
 import com.example.demo.registration.OnRegistrationCompleteEvent;
 import com.example.demo.service.IUserService;
+import com.example.demo.service.UserService;
 import jakarta.mail.internet.MimeMessage;
 import lombok.SneakyThrows;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -25,10 +26,7 @@ import java.util.UUID;
 @Component
 public class RegistrationListener implements ApplicationListener<OnRegistrationCompleteEvent> {
     @Autowired
-    private IUserService service;
-
-    @Autowired
-    private MessageSource messages;
+    private UserService userService;
 
     @Autowired
     private JavaMailSender mailSender;
@@ -36,7 +34,6 @@ public class RegistrationListener implements ApplicationListener<OnRegistrationC
     @Autowired
     private Environment env;
 
-    // API
 
     @Override
     public void onApplicationEvent(final OnRegistrationCompleteEvent event) {
@@ -46,7 +43,7 @@ public class RegistrationListener implements ApplicationListener<OnRegistrationC
     private void confirmRegistration(final OnRegistrationCompleteEvent event) {
         final User user = event.getUser();
         final String token = UUID.randomUUID().toString();
-        service.createVerificationTokenForUser(user, token);
+        userService.createVerificationTokenForUser(user, token);
 
         final MimeMessage email = constructEmailMessage(event, user, token);
         mailSender.send(email);

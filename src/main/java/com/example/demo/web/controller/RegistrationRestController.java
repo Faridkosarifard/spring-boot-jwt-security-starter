@@ -6,6 +6,7 @@ import com.example.demo.persistence.model.Privilege;
 import com.example.demo.persistence.model.Role;
 import com.example.demo.persistence.model.User;
 import com.example.demo.registration.OnRegistrationCompleteEvent;
+
 import com.example.demo.service.CustomAuthenticationService;
 import com.example.demo.service.IUserService;
 import com.example.demo.sping.ISecurityUserService;
@@ -48,13 +49,13 @@ public class RegistrationRestController {
 
     @Autowired
     private MessageSource messages;
-
+    @Autowired
+    private CustomAuthenticationService customAuthenticationService;
     @Autowired
     private ISecurityUserService securityUserService;
-    private final CustomAuthenticationService customAuthenticationService;
     private final TokenProvider tokenProvider;
 
-    @Autowired
+
     private final AuthenticationManager authenticationManager;
 
     @Autowired
@@ -66,11 +67,10 @@ public class RegistrationRestController {
     @Autowired
     private Environment env;
 
-    public RegistrationRestController(IUserService userService, MessageSource messages, CustomAuthenticationService customAuthenticationService, TokenProvider tokenProvider, AuthenticationManager authenticationManager, JavaMailSender mailSender, ApplicationEventPublisher eventPublisher, Environment env) {
+    public RegistrationRestController(IUserService userService, MessageSource messages,TokenProvider tokenProvider,  AuthenticationManager authenticationManager, JavaMailSender mailSender, ApplicationEventPublisher eventPublisher, Environment env) {
         this.userService = userService;
         this.messages = messages;
-        this.customAuthenticationService = customAuthenticationService;
-        this.tokenProvider = tokenProvider;
+        this.tokenProvider=tokenProvider;
         this.authenticationManager = authenticationManager;
         this.mailSender = mailSender;
         this.eventPublisher = eventPublisher;
@@ -157,6 +157,8 @@ public class RegistrationRestController {
         authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(userEntity.getUserName(), userEntity.getPassword()));
         return tokenProvider.getToken(userEntity.getUserName());
     }
+
+
 
 
     private MimeMessage constructResetTokenEmail(final String contextPath, final String token, final User user) {

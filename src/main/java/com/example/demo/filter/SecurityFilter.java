@@ -3,16 +3,12 @@ package com.example.demo.filter;
 import com.example.demo.common.TokenProvider;
 import com.example.demo.service.UserService;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.filter.OncePerRequestFilter;
-
-import javax.servlet.FilterChain;
-import javax.servlet.ServletException;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 
 /**
@@ -24,18 +20,29 @@ import java.io.IOException;
 @Controller
 @Slf4j
 public class SecurityFilter extends OncePerRequestFilter {
-    private final UserService userService;
-    private final TokenProvider tokenProvider;
+    private static final   SecurityFilter SECURITY_FILTER= new SecurityFilter();
 
-    public SecurityFilter(UserService userService, TokenProvider tokenProvider) {
-        this.userService = userService;
-        this.tokenProvider = tokenProvider;
+    public SecurityFilter() {
     }
 
+    public static SecurityFilter getInstance(){
+        return SECURITY_FILTER;
+    }
+
+    private  TokenProvider tokenProvider;
+
+    private  UserService userService;
+    @Autowired
+    public void setTokenProvider(TokenProvider tokenProvider) {
+        this.tokenProvider = tokenProvider;
+    }
+    @Autowired
+    public void setUserService(UserService userService) {
+        this.userService = userService;
+    }
 
     @Override
     protected void doFilterInternal(jakarta.servlet.http.HttpServletRequest request, jakarta.servlet.http.HttpServletResponse response, jakarta.servlet.FilterChain filterChain) throws jakarta.servlet.ServletException, IOException {
-
             if (request.getHeader("Authorization") != null){
                 try {
                     log.info("doFilterInternal");

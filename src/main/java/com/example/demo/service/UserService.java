@@ -37,26 +37,42 @@ import java.util.*;
 @Service
 @Transactional
 public class UserService implements IUserService, UserDetailsService {
-    @Autowired
-    private UserRepository userRepository;
 
-    @Autowired
-    private VerificationTokenRepository tokenRepository;
 
-    @Autowired
-    private PasswordResetTokenRepository passwordTokenRepository;
 
-    @Autowired
-    private PasswordEncoder passwordEncoder;
+    private  UserRepository userRepository;
 
-    @Autowired
-    private RoleRepository roleRepository;
 
-    @Autowired
-    private Environment env;
+    private  VerificationTokenRepository tokenRepository;
 
+
+    private  PasswordResetTokenRepository passwordTokenRepository;
+
+
+    private  PasswordEncoder passwordEncoder;
+
+
+    private  RoleRepository roleRepository;
     @Autowired
-    private SessionRegistry sessionRegistry;
+    public void setUserRepository(UserRepository userRepository) {
+        this.userRepository = userRepository;
+    }
+    @Autowired
+    public void setTokenRepository(VerificationTokenRepository tokenRepository) {
+        this.tokenRepository = tokenRepository;
+    }
+    @Autowired
+    public void setPasswordTokenRepository(PasswordResetTokenRepository passwordTokenRepository) {
+        this.passwordTokenRepository = passwordTokenRepository;
+    }
+    @Autowired
+    public void setPasswordEncoder(PasswordEncoder passwordEncoder) {
+        this.passwordEncoder = passwordEncoder;
+    }
+    @Autowired
+    public void setRoleRepository(RoleRepository roleRepository) {
+        this.roleRepository = roleRepository;
+    }
 
     public static final String TOKEN_INVALID = "invalidToken";
     public static final String TOKEN_EXPIRED = "expired";

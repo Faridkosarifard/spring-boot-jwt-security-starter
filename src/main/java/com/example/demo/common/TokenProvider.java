@@ -4,7 +4,9 @@ import com.auth0.jwt.JWT;
 import com.auth0.jwt.algorithms.Algorithm;
 import com.auth0.jwt.exceptions.JWTCreationException;
 import com.auth0.jwt.exceptions.JWTVerificationException;
+import com.example.demo.persistence.dao.UserRepository;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
@@ -16,16 +18,21 @@ import java.util.Date;
  * Date: 10/9/2023
  * Time: 5:19 PM
  */
+
 @Component
 @Slf4j
 public class TokenProvider {
-    @Value("${jwt.secret-key}")
+
+    @Autowired
+    private UserRepository userRepository;
     private String secretKey;
+    //TODO CHANGE THE ISSUER AT THE END
     @Value("${jwt.issuer}")
     private String issuer;
 
     public String getToken(String username) throws IllegalArgumentException, JWTCreationException {
         log.info("getToken");
+        secretKey = userRepository.findByUserName(username).getSecret();
         return JWT.create()
                 .withClaim("username", username)
                 .withIssuedAt(new Date())
