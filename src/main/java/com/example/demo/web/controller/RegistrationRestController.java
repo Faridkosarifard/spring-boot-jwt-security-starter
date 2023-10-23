@@ -44,32 +44,23 @@ import java.util.stream.Collectors;
  */
 @RestController
 public class RegistrationRestController {
-    @Autowired
+
     private IUserService userService;
 
-    @Autowired
-    private MessageSource messages;
-    @Autowired
-    private CustomAuthenticationService customAuthenticationService;
     @Autowired
     private ISecurityUserService securityUserService;
     private final TokenProvider tokenProvider;
 
-
     private final AuthenticationManager authenticationManager;
 
-    @Autowired
     private JavaMailSender mailSender;
 
-    @Autowired
     private ApplicationEventPublisher eventPublisher;
 
-    @Autowired
     private Environment env;
 
-    public RegistrationRestController(IUserService userService, MessageSource messages,TokenProvider tokenProvider,  AuthenticationManager authenticationManager, JavaMailSender mailSender, ApplicationEventPublisher eventPublisher, Environment env) {
+    public RegistrationRestController(IUserService userService, TokenProvider tokenProvider,  AuthenticationManager authenticationManager, JavaMailSender mailSender, ApplicationEventPublisher eventPublisher, Environment env) {
         this.userService = userService;
-        this.messages = messages;
         this.tokenProvider=tokenProvider;
         this.authenticationManager = authenticationManager;
         this.mailSender = mailSender;
@@ -157,9 +148,6 @@ public class RegistrationRestController {
         authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(userEntity.getUserName(), userEntity.getPassword()));
         return tokenProvider.getToken(userEntity.getUserName());
     }
-
-
-
 
     private MimeMessage constructResetTokenEmail(final String contextPath, final String token, final User user) {
         final String url = contextPath + "/user/changePassword?token=" + token;
