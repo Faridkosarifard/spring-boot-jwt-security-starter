@@ -9,18 +9,22 @@ import com.example.demo.registration.OnRegistrationCompleteEvent;
 
 import com.example.demo.service.CustomAuthenticationService;
 import com.example.demo.service.IUserService;
+import com.example.demo.service.UserService;
 import com.example.demo.sping.ISecurityUserService;
 import com.example.demo.web.dto.PasswordDto;
 import com.example.demo.web.dto.UserDto;
 import com.example.demo.web.util.GenericResponse;
+import com.fasterxml.jackson.annotation.JsonFormat;
 import jakarta.mail.internet.MimeMessage;
 import jakarta.servlet.http.HttpServletRequest;
+import jakarta.ws.rs.Consumes;
 import lombok.SneakyThrows;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.context.MessageSource;
 import org.springframework.core.env.Environment;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -45,7 +49,7 @@ import java.util.stream.Collectors;
 @RestController
 public class RegistrationRestController {
 
-    private IUserService userService;
+    private final IUserService userService;
 
     @Autowired
     private ISecurityUserService securityUserService;
@@ -53,11 +57,11 @@ public class RegistrationRestController {
 
     private final AuthenticationManager authenticationManager;
 
-    private JavaMailSender mailSender;
+    private final JavaMailSender mailSender;
 
-    private ApplicationEventPublisher eventPublisher;
+    private final ApplicationEventPublisher eventPublisher;
 
-    private Environment env;
+    private final Environment env;
 
     public RegistrationRestController(IUserService userService, TokenProvider tokenProvider,  AuthenticationManager authenticationManager, JavaMailSender mailSender, ApplicationEventPublisher eventPublisher, Environment env) {
         this.userService = userService;
@@ -92,58 +96,64 @@ public class RegistrationRestController {
     }
 
     @PostMapping("/user/resetPassword")
-    public GenericResponse resetPassword(final HttpServletRequest request, @RequestBody final String userEmail) {
-        final User user = userService.findUserByEmail(userEmail);
+    //TODO CHECK EMAIL FOR PASS TOKEN IF GENERATED SEND ERROR
+    public ResponseEntity resetPassword(final HttpServletRequest request, @RequestBody final UserDto userDto) {
+        final User user = userService.findUserByEmail(userDto.getEmail());
         if (user != null) {
             final String token = UUID.randomUUID().toString();
             userService.createPasswordResetTokenForUser(user, token);
             mailSender.send(constructResetTokenEmail(getAppUrl(request), token, user));
+            return ResponseEntity.status(HttpStatus.OK).build();
+        }else {
+            return ResponseEntity.status(HttpStatus.NOT_ACCEPTABLE).build();
         }
-        return new GenericResponse("ٍEmail Sent");
     }
 
     @GetMapping("/user/forgetPassword")
-    public Object showChangePasswordPage(final ModelMap model, @RequestBody final String token) {
+    public Object showChangePasswordPage(@RequestParam("token")  final String token) {
         final String result = securityUserService.validatePasswordResetToken(token);
         if(result != null) {
-            String messageKey = "auth.message." + result;
-            model.addAttribute("messageKey", messageKey);
             //TODO REDIRECT TO ERROR PAGE AND SEND THE MSG TO UI
-            return new ModelAndView("redirect:/login", model);
+            return ResponseEntity.status(HttpStatus.NOT_ACCEPTABLE).build();
         } else {
-            model.addAttribute("token", token);
             //TODO REDIRECT TO CHANGE PASSWORD PAGE WITH TOKEN
-            return new ModelAndView("redirect:/updatePassword");
+            return ResponseEntity.status(HttpStatus.ACCEPTED).build();
         }
     }
 
 
     @PostMapping("/user/savePassword")
-    public GenericResponse savePassword(final Locale locale, @RequestBody PasswordDto passwordDto) {
+    public ResponseEntity<HttpStatus> savePassword(final Locale locale, @RequestBody PasswordDto passwordDto) {
         final String result = securityUserService.validatePasswordResetToken(passwordDto.getToken());
         if(result != null) {
-            return new GenericResponse("NULL/expire");
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
         }
         Optional<User> user = userService.getUserByPasswordResetToken(passwordDto.getToken());
         if(user.isPresent()) {
             userService.changeUserPassword(user.get(), passwordDto.getNewPassword());
-            return new GenericResponse("Password Successfully change");
+            userService.deletePasswordResetToken(user.get());
+            return ResponseEntity.status(HttpStatus.OK).build();
         } else {
-            return new GenericResponse("token invalid");
+            return ResponseEntity.status(HttpStatus.NOT_ACCEPTABLE).build();
         }
     }
 
-    @GetMapping("/user/changePassword")
-    public Object changePassword( @RequestBody PasswordDto passwordDto){
-        User user =  userService.findUserByEmail(passwordDto.getEmail());
-        if (!userService.checkIfValidOldPassword(user, passwordDto.getOldPassword())) {
-            System.out.println("not match");
+    @PostMapping("/user/changePassword")
+    public ResponseEntity<HttpStatus> changePassword( @RequestBody PasswordDto passwordDto){
+        if (passwordDto.getNewPassword() != null && passwordDto.getOldPassword() != null && passwordDto.getEmail()!= null){
+            User user =  userService.findUserByEmail(passwordDto.getEmail());
+            if (!userService.checkIfValidOldPassword(user, passwordDto.getOldPassword())) {
+                return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+                //System.out.println("not match");
+            }
+            userService.changeUserPassword(user, passwordDto.getNewPassword());
+            return ResponseEntity.status(HttpStatus.OK).build();
+        }else {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
         }
-        userService.changeUserPassword(user, passwordDto.getNewPassword());
-        return "succ";
     }
 
-    @GetMapping("/login")
+    @GetMapping("/user/login")
     public String login(@RequestBody UserDto userEntity) {
         authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(userEntity.getUserName(), userEntity.getPassword()));
         return tokenProvider.getToken(userEntity.getUserName());

@@ -152,6 +152,11 @@ public class UserService implements IUserService, UserDetailsService {
         return vToken;
     }
 
+    public void deletePasswordResetToken(final User user){
+        PasswordResetToken token = passwordTokenRepository.findByUser(user);
+        passwordTokenRepository.deletePasswordResetTokenByToken(token.getToken());
+    }
+
     @Override
     public void createPasswordResetTokenForUser(final User user, final String token) {
         final PasswordResetToken myToken = new PasswordResetToken(token, user);

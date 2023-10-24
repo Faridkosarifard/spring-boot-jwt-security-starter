@@ -48,6 +48,8 @@ public interface IUserService {
 
     String validateVerificationToken(String token);
 
+    void deletePasswordResetToken(User user);
+
     User updateUser2FA(boolean use2FA);
 
 }
