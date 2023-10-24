@@ -2,10 +2,12 @@
 Spring Boot Security with JWT and multi Role
 ﻿
 
-# ****POST**** New User registration
- **URL:** http://localhost:8086/user/registration
-﻿
-
+#  New User registration
+ **POST**
+ 
+```
+    http://localhost:8086/user/registration
+```
 Body
 ```json
 {
@@ -18,9 +20,12 @@ Body
 }
 ```
 
-# **GET** Email Confirm
-**URL:** http://localhost:8086/registrationConfirm?token=token
-﻿
+#  Email Confirm
+**GET** 
+```
+http://localhost:8086/registrationConfirm?token=token
+
+```
 
 Query Params
 
@@ -28,9 +33,13 @@ Query Params
 token = example-token
 ```
 
-# POST Forget Password
-**URL:** http://localhost:8086/user/resetPassword
-﻿
+#  Forget Password
+**POST** 
+```
+http://localhost:8086/user/resetPassword
+
+```
+
 Body
 
 
@@ -40,9 +49,12 @@ Body
 }
 ```
 
-# GET Rest Password Token Veryfing
-**URL:** http://localhost:8086/user/forgetPassword?token=example-token
-﻿
+#  Rest Password Token Veryfing
+**GET** 
+```
+http://localhost:8086/user/forgetPassword?token=example-token
+
+```
 Query Params
 
 ```
@@ -50,8 +62,11 @@ token = example-token
 ```
 
 # POST Change Password with Token
-**URL:** http://localhost:8086/user/savePassword
-﻿
+**POST** 
+```
+http://localhost:8086/user/savePassword
+
+```
 Body
 ```json
 {
@@ -59,9 +74,13 @@ Body
     "newPassword": "F2123"
 }
 ```
-# POST Change Password
-**URL:** http://localhost:8086/user/changePassword
-﻿
+#  Change Password
+**POST** 
+```
+http://localhost:8086/user/changePassword
+
+```
+
 Body
 ```json
 {
@@ -70,9 +89,13 @@ Body
     "email":"farid.kosarifard@gmil.com"
 }
 ```
-# GET Login
-**URL:** http://localhost:8086/user/login
-﻿
+# Login
+**GET** 
+```
+http://localhost:8086/user/login
+
+```
+
 Body
 ```json
 {
