@@ -7,22 +7,19 @@ import com.example.demo.persistence.model.Role;
 import com.example.demo.persistence.model.User;
 import com.example.demo.registration.OnRegistrationCompleteEvent;
 
-import com.example.demo.service.CustomAuthenticationService;
 import com.example.demo.service.IUserService;
-import com.example.demo.service.UserService;
 import com.example.demo.sping.ISecurityUserService;
 import com.example.demo.web.dto.PasswordDto;
 import com.example.demo.web.dto.UserDto;
-import com.example.demo.web.util.GenericResponse;
-import com.fasterxml.jackson.annotation.JsonFormat;
+import com.example.demo.web.error.UserAlreadyExistException;
 import jakarta.mail.internet.MimeMessage;
 import jakarta.servlet.http.HttpServletRequest;
-import jakarta.ws.rs.Consumes;
 import lombok.SneakyThrows;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationEventPublisher;
-import org.springframework.context.MessageSource;
 import org.springframework.core.env.Environment;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.mail.javamail.JavaMailSender;
@@ -32,9 +29,7 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.ui.ModelMap;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.servlet.ModelAndView;
 
 import java.io.UnsupportedEncodingException;
 import java.util.*;
@@ -47,6 +42,7 @@ import java.util.stream.Collectors;
  * Time: 5:17 PM
  */
 @RestController
+@Slf4j
 public class RegistrationRestController {
 
     private final IUserService userService;
@@ -73,11 +69,22 @@ public class RegistrationRestController {
     }
 
     @PostMapping("/user/registration")
-    public Object registerUserAccount(@RequestBody final UserDto accountDto, final HttpServletRequest request) {
-        //LOGGER.debug("Registering user account with information: {}", accountDto);
-        User registered = userService.registerNewUserAccount(accountDto);
-        eventPublisher.publishEvent(new OnRegistrationCompleteEvent(registered, request.getLocale(), getAppUrl(request)));
-        return new GenericResponse("success");
+    public ResponseEntity<HttpStatus> registerUserAccount(@RequestBody final UserDto accountDto, final HttpServletRequest request) {
+        try {
+            if (accountDto.getUserName()!=null && accountDto.getPassword() !=null) {
+                log.info("Registering user account with information: {}", accountDto);
+                User registered = userService.registerNewUserAccount(accountDto);
+                eventPublisher.publishEvent(new OnRegistrationCompleteEvent(registered, request.getLocale(), getAppUrl(request)));
+                log.info("Registration completed");
+                return ResponseEntity.status(HttpStatus.OK).build();
+            }else {
+                log.error("Registration user failed: username or password empty {}",accountDto);
+                return ResponseEntity.status(HttpStatus.NOT_ACCEPTABLE).build();
+            }
+        }catch (Exception e){
+            log.error(new UserAlreadyExistException(e.getMessage()).getMessage());
+            return ResponseEntity.status(HttpStatus.CONFLICT).build();
+        }
     }
 
     @GetMapping("/registrationConfirm")
@@ -86,38 +93,53 @@ public class RegistrationRestController {
         if (result.equals("valid")) {
             final User user = userService.getUser(token);
             authWithoutPassword(user);
-            System.out.println("OK");
+            log.info("Validation for user {} with email {} ist completed.",user.getUserName(),user.getEmail());
             //TODO REDIRECT TO HOME PAGE
             return HttpStatus.OK;
         }
-        System.out.println("Not ok ");
+        log.error("Validation failed, Token {} not valid.",token);
         //TODO REDIRECT TO LOGIN PAGE
         return HttpStatus.NOT_ACCEPTABLE;
     }
 
     @PostMapping("/user/resetPassword")
-    //TODO CHECK EMAIL FOR PASS TOKEN IF GENERATED SEND ERROR
-    public ResponseEntity resetPassword(final HttpServletRequest request, @RequestBody final UserDto userDto) {
+    public ResponseEntity<HttpStatus> resetPassword(final HttpServletRequest request, @RequestBody final UserDto userDto) {
         final User user = userService.findUserByEmail(userDto.getEmail());
-        if (user != null) {
-            final String token = UUID.randomUUID().toString();
-            userService.createPasswordResetTokenForUser(user, token);
-            mailSender.send(constructResetTokenEmail(getAppUrl(request), token, user));
-            return ResponseEntity.status(HttpStatus.OK).build();
-        }else {
-            return ResponseEntity.status(HttpStatus.NOT_ACCEPTABLE).build();
+        try {
+            if (user != null) {
+                final String token = UUID.randomUUID().toString();
+                userService.createPasswordResetTokenForUser(user, token);
+                mailSender.send(constructResetTokenEmail(getAppUrl(request), token, user));
+                return ResponseEntity.status(HttpStatus.OK).build();
+            }else {
+                log.error("Not Found user account with email {}:", userDto.getEmail());
+                return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+            }
+        } catch (DataIntegrityViolationException ex) {
+            log.error("Token already exists for this user.{}", userDto.getEmail() +"Error msg: "+ ex.getMessage());
+            return ResponseEntity.status(HttpStatus.CONFLICT).build();
+        } catch (Exception e) {
+            log.error("An error occurred."+ e.getMessage());
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
         }
     }
 
     @GetMapping("/user/forgetPassword")
     public Object showChangePasswordPage(@RequestParam("token")  final String token) {
-        final String result = securityUserService.validatePasswordResetToken(token);
-        if(result != null) {
-            //TODO REDIRECT TO ERROR PAGE AND SEND THE MSG TO UI
-            return ResponseEntity.status(HttpStatus.NOT_ACCEPTABLE).build();
-        } else {
-            //TODO REDIRECT TO CHANGE PASSWORD PAGE WITH TOKEN
-            return ResponseEntity.status(HttpStatus.ACCEPTED).build();
+        try {
+            final String result = securityUserService.validatePasswordResetToken(token);
+            if (result != null) {
+                log.error("Token {} not valid", token);
+                //TODO REDIRECT TO ERROR PAGE AND SEND THE MSG TO UI
+                return ResponseEntity.status(HttpStatus.NOT_ACCEPTABLE).build();
+            } else {
+                log.info("Password Token verified and Redirect to Reset Password Page");
+                //TODO REDIRECT TO CHANGE PASSWORD PAGE WITH TOKEN
+                return ResponseEntity.status(HttpStatus.ACCEPTED).build();
+            }
+        }catch (Exception e){
+            log.error("An error occurred." + e.getMessage());
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
         }
     }
 
