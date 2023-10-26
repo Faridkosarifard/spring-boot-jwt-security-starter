@@ -1,6 +1,10 @@
 # Spring-Boot-Security-
 Spring Boot Security with JWT and multi Role
-﻿
+
+
+# Swagger UI
+
+    http://localhost:8095/swagger-ui/index.html
 
 #  New User registration
  **POST**
