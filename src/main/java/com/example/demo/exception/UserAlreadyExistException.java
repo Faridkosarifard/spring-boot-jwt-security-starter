@@ -1,4 +1,4 @@
-package com.example.demo.web.error;
+package com.example.demo.exception;
 
 /**
  * demo

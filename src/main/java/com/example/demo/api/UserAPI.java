@@ -1,7 +1,7 @@
-package com.example.demo.web.controller;
+package com.example.demo.api;
 
-import com.example.demo.persistence.dao.UserRepository;
-import com.example.demo.persistence.model.User;
+import com.example.demo.domain.dao.UserRepository;
+import com.example.demo.domain.model.User;
 
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.GetMapping;

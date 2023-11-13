@@ -1,22 +1,22 @@
-package com.example.demo.web.controller;
+package com.example.demo.api;
 
 import com.example.demo.common.MailHtmlContent;
 import com.example.demo.common.TokenProvider;
-import com.example.demo.persistence.model.Privilege;
-import com.example.demo.persistence.model.Role;
-import com.example.demo.persistence.model.User;
+import com.example.demo.domain.model.Privilege;
+import com.example.demo.domain.model.Role;
+import com.example.demo.domain.model.User;
+import com.example.demo.domain.view.Views;
 import com.example.demo.registration.OnRegistrationCompleteEvent;
-
 import com.example.demo.service.IUserService;
 import com.example.demo.sping.ISecurityUserService;
-import com.example.demo.web.dto.PasswordDto;
-import com.example.demo.web.dto.UserDto;
-import com.example.demo.web.error.UserAlreadyExistException;
+import com.example.demo.domain.dto.PasswordDto;
+import com.example.demo.domain.dto.UserDto;
+import com.example.demo.exception.UserAlreadyExistException;
+import com.fasterxml.jackson.annotation.JsonView;
 import jakarta.mail.internet.MimeMessage;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.core.env.Environment;
 import org.springframework.dao.DataIntegrityViolationException;
@@ -46,42 +46,37 @@ import java.util.stream.Collectors;
 public class RegistrationRestController {
 
     private final IUserService userService;
-
-    @Autowired
-    private ISecurityUserService securityUserService;
     private final TokenProvider tokenProvider;
-
     private final AuthenticationManager authenticationManager;
-
     private final JavaMailSender mailSender;
-
     private final ApplicationEventPublisher eventPublisher;
-
     private final Environment env;
+    private final ISecurityUserService securityUserService;
 
-    public RegistrationRestController(IUserService userService, TokenProvider tokenProvider,  AuthenticationManager authenticationManager, JavaMailSender mailSender, ApplicationEventPublisher eventPublisher, Environment env) {
+    public RegistrationRestController(IUserService userService, TokenProvider tokenProvider, AuthenticationManager authenticationManager, JavaMailSender mailSender, ApplicationEventPublisher eventPublisher, Environment env, ISecurityUserService securityUserService) {
         this.userService = userService;
-        this.tokenProvider=tokenProvider;
+        this.tokenProvider = tokenProvider;
         this.authenticationManager = authenticationManager;
         this.mailSender = mailSender;
         this.eventPublisher = eventPublisher;
         this.env = env;
+        this.securityUserService = securityUserService;
     }
 
     @PostMapping("/user/registration")
     public ResponseEntity<HttpStatus> registerUserAccount(@RequestBody final UserDto accountDto, final HttpServletRequest request) {
         try {
-            if (accountDto.getUserName()!=null && accountDto.getPassword() !=null) {
+            if (accountDto.getUsername() != null && accountDto.getPassword() != null) {
                 log.info("Registering user account with information: {}", accountDto);
                 User registered = userService.registerNewUserAccount(accountDto);
                 eventPublisher.publishEvent(new OnRegistrationCompleteEvent(registered, request.getLocale(), getAppUrl(request)));
                 log.info("Registration completed");
                 return ResponseEntity.status(HttpStatus.OK).build();
-            }else {
-                log.error("Registration user failed: username or password empty {}",accountDto);
+            } else {
+                log.error("Registration user failed: username or password empty {}", accountDto);
                 return ResponseEntity.status(HttpStatus.NOT_ACCEPTABLE).build();
             }
-        }catch (Exception e){
+        } catch (Exception e) {
             log.error(new UserAlreadyExistException(e.getMessage()).getMessage());
             return ResponseEntity.status(HttpStatus.CONFLICT).build();
         }
@@ -93,11 +88,11 @@ public class RegistrationRestController {
         if (result.equals("valid")) {
             final User user = userService.getUser(token);
             authWithoutPassword(user);
-            log.info("Validation for user {} with email {} ist completed.",user.getUserName(),user.getEmail());
+            log.info("Validation for user {} with email {} ist completed.", user.getUserName(), user.getEmail());
             //TODO REDIRECT TO HOME PAGE
             return HttpStatus.OK;
         }
-        log.error("Validation failed, Token {} not valid.",token);
+        log.error("Validation failed, Token {} not valid.", token);
         //TODO REDIRECT TO LOGIN PAGE
         return HttpStatus.NOT_ACCEPTABLE;
     }
@@ -111,21 +106,21 @@ public class RegistrationRestController {
                 userService.createPasswordResetTokenForUser(user, token);
                 mailSender.send(constructResetTokenEmail(getAppUrl(request), token, user));
                 return ResponseEntity.status(HttpStatus.OK).build();
-            }else {
+            } else {
                 log.error("Not Found user account with email {}:", userDto.getEmail());
                 return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
             }
         } catch (DataIntegrityViolationException ex) {
-            log.error("Token already exists for this user.{}", userDto.getEmail() +"Error msg: "+ ex.getMessage());
+            log.error("Token already exists for this user.{}", userDto.getEmail() + "Error msg: " + ex.getMessage());
             return ResponseEntity.status(HttpStatus.CONFLICT).build();
         } catch (Exception e) {
-            log.error("An error occurred."+ e.getMessage());
+            log.error("An error occurred." + e.getMessage());
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
         }
     }
 
     @GetMapping("/user/forgetPassword")
-    public Object showChangePasswordPage(@RequestParam("token")  final String token) {
+    public Object showChangePasswordPage(@RequestParam("token") final String token) {
         try {
             final String result = securityUserService.validatePasswordResetToken(token);
             if (result != null) {
@@ -137,7 +132,7 @@ public class RegistrationRestController {
                 //TODO REDIRECT TO CHANGE PASSWORD PAGE WITH TOKEN
                 return ResponseEntity.status(HttpStatus.ACCEPTED).build();
             }
-        }catch (Exception e){
+        } catch (Exception e) {
             log.error("An error occurred." + e.getMessage());
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
         }
@@ -147,11 +142,11 @@ public class RegistrationRestController {
     @PostMapping("/user/savePassword")
     public ResponseEntity<HttpStatus> savePassword(final Locale locale, @RequestBody PasswordDto passwordDto) {
         final String result = securityUserService.validatePasswordResetToken(passwordDto.getToken());
-        if(result != null) {
+        if (result != null) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
         }
         Optional<User> user = userService.getUserByPasswordResetToken(passwordDto.getToken());
-        if(user.isPresent()) {
+        if (user.isPresent()) {
             userService.changeUserPassword(user.get(), passwordDto.getNewPassword());
             userService.deletePasswordResetToken(user.get());
             return ResponseEntity.status(HttpStatus.OK).build();
@@ -161,31 +156,33 @@ public class RegistrationRestController {
     }
 
     @PostMapping("/user/changePassword")
-    public ResponseEntity<HttpStatus> changePassword( @RequestBody PasswordDto passwordDto){
-        if (passwordDto.getNewPassword() != null && passwordDto.getOldPassword() != null && passwordDto.getEmail()!= null){
-            User user =  userService.findUserByEmail(passwordDto.getEmail());
+    public ResponseEntity<HttpStatus> changePassword(@RequestBody PasswordDto passwordDto) {
+        if (passwordDto.getNewPassword() != null && passwordDto.getOldPassword() != null && passwordDto.getEmail() != null) {
+            User user = userService.findUserByEmail(passwordDto.getEmail());
             if (!userService.checkIfValidOldPassword(user, passwordDto.getOldPassword())) {
                 return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
                 //System.out.println("not match");
             }
             userService.changeUserPassword(user, passwordDto.getNewPassword());
             return ResponseEntity.status(HttpStatus.OK).build();
-        }else {
+        } else {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
         }
     }
 
-    @GetMapping("/user/login")
+    @PostMapping("/user/login")
+    @JsonView(Views.Login.class)
     public String login(@RequestBody UserDto userEntity) {
-        authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(userEntity.getUserName(), userEntity.getPassword()));
-        return tokenProvider.getToken(userEntity.getUserName());
+        authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(userEntity.getUsername(), userEntity.getPassword()));
+        return tokenProvider.getToken(userEntity.getUsername());
     }
 
     private MimeMessage constructResetTokenEmail(final String contextPath, final String token, final User user) {
         final String url = contextPath + "/user/changePassword?token=" + token;
-        final String message = MailHtmlContent.getInstance().forgetPasswordHtmlContent(user.getFirstName(),user.getLastName(),url);
-        return constructEmail("فراموشی رمز عبور", message , user);
+        final String message = MailHtmlContent.getInstance().forgetPasswordHtmlContent(user.getFirstName(), user.getLastName(), url);
+        return constructEmail("فراموشی رمز عبور", message, user);
     }
+
     @SneakyThrows
     private MimeMessage constructEmail(String subject, String body, User user) {
         MimeMessage email = mailSender.createMimeMessage();
@@ -195,6 +192,7 @@ public class RegistrationRestController {
         email.setFrom(env.getProperty("support.email"));
         return email;
     }
+
     private String getAppUrl(HttpServletRequest request) {
         return "http://" + request.getServerName() + ":" + request.getServerPort() + request.getContextPath();
     }

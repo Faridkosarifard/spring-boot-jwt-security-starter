@@ -1,11 +1,11 @@
 package com.example.demo.sping;
 
-import com.example.demo.persistence.dao.PrivilegeRepository;
-import com.example.demo.persistence.dao.RoleRepository;
-import com.example.demo.persistence.dao.UserRepository;
-import com.example.demo.persistence.model.Privilege;
-import com.example.demo.persistence.model.Role;
-import com.example.demo.persistence.model.User;
+import com.example.demo.domain.dao.PrivilegeRepository;
+import com.example.demo.domain.dao.RoleRepository;
+import com.example.demo.domain.dao.UserRepository;
+import com.example.demo.domain.model.Privilege;
+import com.example.demo.domain.model.Role;
+import com.example.demo.domain.model.User;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationListener;
 import org.springframework.context.event.ContextRefreshedEvent;

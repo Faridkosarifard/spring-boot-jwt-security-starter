@@ -1,7 +1,7 @@
-package com.example.demo.persistence.dao;
+package com.example.demo.domain.dao;
 
-import com.example.demo.persistence.model.PasswordResetToken;
-import com.example.demo.persistence.model.User;
+import com.example.demo.domain.model.PasswordResetToken;
+import com.example.demo.domain.model.User;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;

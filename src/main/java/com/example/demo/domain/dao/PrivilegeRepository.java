@@ -1,6 +1,6 @@
-package com.example.demo.persistence.dao;
+package com.example.demo.domain.dao;
 
-import com.example.demo.persistence.model.Privilege;
+import com.example.demo.domain.model.Privilege;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 /**

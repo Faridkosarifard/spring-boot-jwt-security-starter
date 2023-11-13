@@ -1,6 +1,6 @@
 package com.example.demo.registration;
 
-import com.example.demo.persistence.model.User;
+import com.example.demo.domain.model.User;
 import org.springframework.context.ApplicationEvent;
 
 

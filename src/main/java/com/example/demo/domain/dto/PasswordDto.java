@@ -1,4 +1,4 @@
-package com.example.demo.web.dto;
+package com.example.demo.domain.dto;
 
 import com.example.demo.Validation.ValidPassword;
 

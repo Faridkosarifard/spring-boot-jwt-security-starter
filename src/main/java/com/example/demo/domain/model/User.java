@@ -1,9 +1,8 @@
-package com.example.demo.persistence.model;
+package com.example.demo.domain.model;
 
 import jakarta.persistence.*;
 import lombok.*;
 import org.jboss.aerogear.security.otp.api.Base32;
-import org.springframework.security.core.userdetails.UserDetails;
 
 import java.io.Serializable;
 import java.util.Collection;

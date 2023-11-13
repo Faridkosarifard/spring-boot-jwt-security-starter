@@ -1,7 +1,7 @@
 package com.example.demo.task;
 
-import com.example.demo.persistence.dao.PasswordResetTokenRepository;
-import com.example.demo.persistence.dao.VerificationTokenRepository;
+import com.example.demo.domain.dao.PasswordResetTokenRepository;
+import com.example.demo.domain.dao.VerificationTokenRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;

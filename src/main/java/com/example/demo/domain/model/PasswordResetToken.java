@@ -1,9 +1,6 @@
-package com.example.demo.persistence.model;
+package com.example.demo.domain.model;
 
 import jakarta.persistence.*;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.Setter;
 
 import java.io.Serializable;
 import java.util.Calendar;

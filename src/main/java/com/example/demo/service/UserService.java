@@ -1,25 +1,22 @@
 package com.example.demo.service;
 
-import com.example.demo.persistence.dao.PasswordResetTokenRepository;
-import com.example.demo.persistence.dao.RoleRepository;
-import com.example.demo.persistence.dao.UserRepository;
-import com.example.demo.persistence.dao.VerificationTokenRepository;
-import com.example.demo.persistence.model.PasswordResetToken;
+import com.example.demo.domain.dao.PasswordResetTokenRepository;
+import com.example.demo.domain.dao.RoleRepository;
+import com.example.demo.domain.dao.UserRepository;
+import com.example.demo.domain.dao.VerificationTokenRepository;
+import com.example.demo.domain.model.PasswordResetToken;
 
-import com.example.demo.persistence.model.Role;
-import com.example.demo.persistence.model.User;
-import com.example.demo.persistence.model.VerificationToken;
-import com.example.demo.web.dto.UserDto;
-import com.example.demo.web.error.UserAlreadyExistException;
+import com.example.demo.domain.model.Role;
+import com.example.demo.domain.model.User;
+import com.example.demo.domain.model.VerificationToken;
+import com.example.demo.domain.dto.UserDto;
+import com.example.demo.exception.UserAlreadyExistException;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.core.env.Environment;
-import org.springframework.http.HttpStatus;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.core.session.SessionRegistry;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -27,7 +24,6 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.io.UnsupportedEncodingException;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -93,7 +89,7 @@ public class UserService implements IUserService, UserDetailsService {
         user.setEmail(accountDto.getEmail());
         user.setBirthDay(accountDto.getBirthDay());
         user.setPhoneNumber(accountDto.getPhoneNumber());
-        user.setUserName(accountDto.getUserName());
+        user.setUserName(accountDto.getUsername());
         user.setUsing2FA(accountDto.isUsing2FA());
         user.setRoles(Collections.singletonList(roleRepository.findByName("ROLE_USER")));
         return userRepository.save(user);

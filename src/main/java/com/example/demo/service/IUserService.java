@@ -1,13 +1,10 @@
 package com.example.demo.service;
 
-import com.example.demo.persistence.model.PasswordResetToken;
-import com.example.demo.persistence.model.User;
-import com.example.demo.persistence.model.VerificationToken;
-import com.example.demo.web.dto.UserDto;
-import org.springframework.security.core.userdetails.UserDetailsService;
+import com.example.demo.domain.model.PasswordResetToken;
+import com.example.demo.domain.model.User;
+import com.example.demo.domain.model.VerificationToken;
+import com.example.demo.domain.dto.UserDto;
 
-import java.io.UnsupportedEncodingException;
-import java.util.List;
 import java.util.Optional;
 
 /**

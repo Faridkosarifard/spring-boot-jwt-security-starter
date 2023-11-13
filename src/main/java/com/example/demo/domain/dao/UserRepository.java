@@ -1,11 +1,7 @@
-package com.example.demo.persistence.dao;
+package com.example.demo.domain.dao;
 
-import com.example.demo.persistence.model.Role;
-import com.example.demo.persistence.model.User;
+import com.example.demo.domain.model.User;
 import org.springframework.data.jpa.repository.JpaRepository;
-
-import java.util.Collection;
-import java.util.Optional;
 
 /**
  * demo
