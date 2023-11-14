@@ -1,6 +1,12 @@
 package com.example.demo.domain.dto;
 
 import com.example.demo.Validation.ValidPassword;
+import com.example.demo.domain.view.Views;
+import com.fasterxml.jackson.annotation.JsonView;
+import lombok.Builder;
+import lombok.Data;
+import lombok.Getter;
+import lombok.Setter;
 
 /**
  * demo
@@ -8,47 +14,20 @@ import com.example.demo.Validation.ValidPassword;
  * Date: 10/9/2023
  * Time: 2:41 PM
  */
+@Data
+@Builder
 public class PasswordDto {
 
+    @JsonView({Views.User.class, Views.ChangePassword.class})
     private String oldPassword;
 
+    @JsonView(Views.SavePassword.class)
     private  String token;
 
     @ValidPassword
+    @JsonView({Views.SavePassword.class, Views.ChangePassword.class})
     private String newPassword;
 
+    @JsonView({Views.User.class, Views.ChangePassword.class})
     private String email;
-
-    public String getOldPassword() {
-        return oldPassword;
-    }
-
-    public void setOldPassword(String oldPassword) {
-        this.oldPassword = oldPassword;
-    }
-
-    public String getNewPassword() {
-        return newPassword;
-    }
-
-    public void setNewPassword(String newPassword) {
-        this.newPassword = newPassword;
-    }
-
-    public String getToken() {
-        return token;
-    }
-
-    public void setToken(String token) {
-        this.token = token;
-    }
-
-    public String getEmail() {
-        return email;
-    }
-
-    public PasswordDto setEmail(String email) {
-        this.email = email;
-        return this;
-    }
 }

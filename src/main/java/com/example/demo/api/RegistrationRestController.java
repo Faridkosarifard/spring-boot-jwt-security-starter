@@ -64,6 +64,7 @@ public class RegistrationRestController {
     }
 
     @PostMapping("/user/registration")
+    @JsonView(Views.Registration.class)
     public ResponseEntity<HttpStatus> registerUserAccount(@RequestBody final UserDto accountDto, final HttpServletRequest request) {
         try {
             if (accountDto.getUsername() != null && accountDto.getPassword() != null) {
@@ -98,6 +99,7 @@ public class RegistrationRestController {
     }
 
     @PostMapping("/user/resetPassword")
+    @JsonView(Views.ResetPassword.class)
     public ResponseEntity<HttpStatus> resetPassword(final HttpServletRequest request, @RequestBody final UserDto userDto) {
         final User user = userService.findUserByEmail(userDto.getEmail());
         try {
@@ -138,8 +140,8 @@ public class RegistrationRestController {
         }
     }
 
-
     @PostMapping("/user/savePassword")
+    @JsonView(Views.SavePassword.class)
     public ResponseEntity<HttpStatus> savePassword(final Locale locale, @RequestBody PasswordDto passwordDto) {
         final String result = securityUserService.validatePasswordResetToken(passwordDto.getToken());
         if (result != null) {
@@ -155,13 +157,15 @@ public class RegistrationRestController {
         }
     }
 
+
+
     @PostMapping("/user/changePassword")
+    @JsonView(Views.ChangePassword.class)
     public ResponseEntity<HttpStatus> changePassword(@RequestBody PasswordDto passwordDto) {
         if (passwordDto.getNewPassword() != null && passwordDto.getOldPassword() != null && passwordDto.getEmail() != null) {
             User user = userService.findUserByEmail(passwordDto.getEmail());
             if (!userService.checkIfValidOldPassword(user, passwordDto.getOldPassword())) {
                 return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
-                //System.out.println("not match");
             }
             userService.changeUserPassword(user, passwordDto.getNewPassword());
             return ResponseEntity.status(HttpStatus.OK).build();

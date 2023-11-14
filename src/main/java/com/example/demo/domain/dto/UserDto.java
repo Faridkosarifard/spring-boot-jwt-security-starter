@@ -8,6 +8,7 @@ import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 import lombok.Builder;
 import lombok.Data;
+import lombok.ToString;
 
 /**
  * demo
@@ -18,63 +19,60 @@ import lombok.Data;
 
 @Data
 @Builder
+@ToString
 public class UserDto {
+
     @NotNull
     @Size(min = 1, message = "{Size.userDto.firstName}")
+    @JsonView({Views.User.class, Views.Registration.class})
     private String firstName;
 
     @NotNull
     @Size(min = 1, message = "{Size.userDto.lastName}")
+    @JsonView({Views.User.class, Views.Registration.class})
     private String lastName;
 
     @ValidPassword
-    @JsonView(Views.Login.class)
+    @JsonView({Views.Login.class, Views.Registration.class})
     private String password;
-
 
     @ValidEmail
     @NotNull
     @Size(min = 1, message = "{Size.userDto.email}")
+    @JsonView({Views.User.class, Views.ResetPassword.class, Views.Registration.class})
     private String email;
 
+    @JsonView(Views.User.class)
     private String birthDay;
+
     @NotNull
     @Size(min=11,max = 11)
+    @JsonView(Views.User.class)
     private String phoneNumber;
 
-    @JsonView(Views.Login.class)
+    @JsonView({Views.Login.class, Views.Registration.class})
     private String username;
 
-    private boolean isUsing2FA;
+    @JsonView({Views.User.class, Views.Registration.class})
+    private boolean use2FA;
 
-    public String getEmail() {
-        return email;
-    }
-
-    public void setEmail(final String email) {
-        this.email = email;
-    }
-
+    @JsonView(Views.User.class)
     private Integer role;
 
-
-
-
-
-    @Override
-    public String toString() {
-        final StringBuilder builder = new StringBuilder();
-        builder.append("UserDto [firstName=")
-                .append(firstName)
-                .append(", lastName=")
-                .append(lastName)
-                .append(", email=")
-                .append(email)
-                .append(", isUsing2FA=")
-                .append(isUsing2FA)
-                .append(", role=")
-                .append(role).append("]");
-        return builder.toString();
-    }
+//    @Override
+//    public String toString() {
+//        final StringBuilder builder = new StringBuilder();
+//        builder.append("UserDto [firstName=")
+//                .append(firstName)
+//                .append(", lastName=")
+//                .append(lastName)
+//                .append(", email=")
+//                .append(email)
+//                .append(", isUsing2FA=")
+//                .append(isUsing2FA)
+//                .append(", role=")
+//                .append(role).append("]");
+//        return builder.toString();
+//    }
 
 }

@@ -90,7 +90,7 @@ public class UserService implements IUserService, UserDetailsService {
         user.setBirthDay(accountDto.getBirthDay());
         user.setPhoneNumber(accountDto.getPhoneNumber());
         user.setUserName(accountDto.getUsername());
-        user.setUsing2FA(accountDto.isUsing2FA());
+        user.setUsing2FA(accountDto.isUse2FA());
         user.setRoles(Collections.singletonList(roleRepository.findByName("ROLE_USER")));
         return userRepository.save(user);
     }
