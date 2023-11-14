@@ -59,20 +59,4 @@ public class UserDto {
     @JsonView(Views.User.class)
     private Integer role;
 
-//    @Override
-//    public String toString() {
-//        final StringBuilder builder = new StringBuilder();
-//        builder.append("UserDto [firstName=")
-//                .append(firstName)
-//                .append(", lastName=")
-//                .append(lastName)
-//                .append(", email=")
-//                .append(email)
-//                .append(", isUsing2FA=")
-//                .append(isUsing2FA)
-//                .append(", role=")
-//                .append(role).append("]");
-//        return builder.toString();
-//    }
-
 }
