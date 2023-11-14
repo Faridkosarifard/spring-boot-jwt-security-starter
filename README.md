@@ -15,12 +15,12 @@ Spring Boot Security with JWT and multi Role
 Body
 ```json
 {
-    "firstName": "Jane",
-    "lastName": "Doe",
-    "userName": "farid",
-    "password": "Faridkosari12##",
-    "email": "farid.kosarifard@gmail.com",
-    "isUsing2FA": "false"
+    "firstName": "First Name",
+    "lastName": "Last Name",
+    "userName": "Username",
+    "password": "password",
+    "email": "Email@gmail.com",
+    "use2FA": "false"
 }
 ```
 
@@ -49,7 +49,7 @@ Body
 
 ```json
 {
-    "email": "farid.kosarifard@gmail.com"
+    "email": "Email@gmail.com"
 }
 ```
 
@@ -88,9 +88,9 @@ http://localhost:8086/user/changePassword
 Body
 ```json
 {
-    "oldPassword":"example-password",
-    "newPassword":"F271@9506m",
-    "email":"farid.kosarifard@gmil.com"
+    "oldPassword":"Old Password",
+    "newPassword":"New Password",
+    "email":"Email@gmil.com"
 }
 ```
 # Login
@@ -103,7 +103,7 @@ http://localhost:8086/user/login
 Body
 ```json
 {
-    "userName": "farid",
-    "password": "F271@9506m" 
+    "userName": "Username",
+    "password": "Password" 
 }
 ```
