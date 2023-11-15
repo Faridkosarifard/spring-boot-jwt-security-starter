@@ -88,7 +88,7 @@ public class SetupDataLoader implements ApplicationListener<ContextRefreshedEven
     }
 
     @Transactional
-    public User createUserIfNotFound(final String email, final String firstName, final String lastName, final String userName,final String password, final Collection<Role> roles) {
+    public User createUserIfNotFound(final String email, final String firstName, final String lastName, final String username,final String password, final Collection<Role> roles) {
         User user = userRepository.findByEmail(email);
         if (user == null) {
             user = new User();
@@ -96,7 +96,7 @@ public class SetupDataLoader implements ApplicationListener<ContextRefreshedEven
             user.setLastName(lastName);
             user.setPassword(passwordEncoder.encode(password));
             user.setEmail(email);
-            user.setUserName(userName);
+            user.setUsername(username);
             user.setEnabled(true);
         }
         user.setRoles(roles);

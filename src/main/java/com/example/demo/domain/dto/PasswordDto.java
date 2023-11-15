@@ -3,10 +3,7 @@ package com.example.demo.domain.dto;
 import com.example.demo.Validation.ValidPassword;
 import com.example.demo.domain.view.Views;
 import com.fasterxml.jackson.annotation.JsonView;
-import lombok.Builder;
-import lombok.Data;
-import lombok.Getter;
-import lombok.Setter;
+import lombok.*;
 
 /**
  * demo
@@ -16,6 +13,8 @@ import lombok.Setter;
  */
 @Data
 @Builder
+@AllArgsConstructor
+@NoArgsConstructor
 public class PasswordDto {
 
     @JsonView({Views.User.class, Views.ChangePassword.class})

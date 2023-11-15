@@ -17,6 +17,7 @@ import jakarta.mail.internet.MimeMessage;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.core.env.Environment;
 import org.springframework.dao.DataIntegrityViolationException;
@@ -51,7 +52,9 @@ public class RegistrationRestController {
     private final JavaMailSender mailSender;
     private final ApplicationEventPublisher eventPublisher;
     private final Environment env;
-    private final ISecurityUserService securityUserService;
+
+    @Autowired
+    private ISecurityUserService securityUserService;
 
     public RegistrationRestController(IUserService userService, TokenProvider tokenProvider, AuthenticationManager authenticationManager, JavaMailSender mailSender, ApplicationEventPublisher eventPublisher, Environment env, ISecurityUserService securityUserService) {
         this.userService = userService;
@@ -60,7 +63,6 @@ public class RegistrationRestController {
         this.mailSender = mailSender;
         this.eventPublisher = eventPublisher;
         this.env = env;
-        this.securityUserService = securityUserService;
     }
 
     @PostMapping("/user/registration")
@@ -89,7 +91,7 @@ public class RegistrationRestController {
         if (result.equals("valid")) {
             final User user = userService.getUser(token);
             authWithoutPassword(user);
-            log.info("Validation for user {} with email {} ist completed.", user.getUserName(), user.getEmail());
+            log.info("Validation for user {} with email {} ist completed.", user.getUsername(), user.getEmail());
             //TODO REDIRECT TO HOME PAGE
             return HttpStatus.OK;
         }

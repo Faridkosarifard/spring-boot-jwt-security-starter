@@ -31,7 +31,7 @@ public class TokenProvider {
 
     public String getToken(String username) throws IllegalArgumentException, JWTCreationException {
         log.info("getToken");
-        String secretKey = userRepository.findByUserName(username).getSecret();
+        String secretKey = userRepository.findByUsername(username).getSecret();
         System.out.println(secretKey);
         return JWT.create()
                 .withClaim("username", username)
@@ -43,7 +43,7 @@ public class TokenProvider {
     public String verifyToken(String token) throws JWTVerificationException {
         log.info("verifyToken");
         String userName= JWT.decode(token).getClaim("username").asString();
-        String secretKey = userRepository.findByUserName(userName).getSecret();
+        String secretKey = userRepository.findByUsername(userName).getSecret();
         return JWT.require(Algorithm.HMAC256(secretKey))
                 .withIssuer(issuer)
                 .build().verify(token).getClaim("username").asString();

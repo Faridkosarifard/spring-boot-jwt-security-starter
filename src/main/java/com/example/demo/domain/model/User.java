@@ -29,7 +29,7 @@ public class User implements Serializable {
 
     private String lastName;
 
-    private String userName;
+    private String username;
 
     private String email;
 
@@ -86,7 +86,7 @@ public class User implements Serializable {
                 .append(", lastName=").append(lastName)
                 .append(", email=").append(email)
                 .append(", enabled=").append(enabled)
-                .append(", userName=").append(userName)
+                .append(", username=").append(username)
                 .append(", isUsing2FA=").append(isUsing2FA)
                 .append(", secret=").append(secret)
                 .append(", roles=").append(roles)

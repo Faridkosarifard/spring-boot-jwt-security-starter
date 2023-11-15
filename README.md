@@ -17,7 +17,7 @@ Body
 {
     "firstName": "First Name",
     "lastName": "Last Name",
-    "userName": "Username",
+    "username": "Username",
     "password": "password",
     "email": "Email@gmail.com",
     "use2FA": "false"
@@ -103,7 +103,7 @@ http://localhost:8086/user/login
 Body
 ```json
 {
-    "userName": "Username",
+    "username": "Username",
     "password": "Password" 
 }
 ```

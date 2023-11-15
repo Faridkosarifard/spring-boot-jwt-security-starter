@@ -6,9 +6,7 @@ import com.example.demo.domain.view.Views;
 import com.fasterxml.jackson.annotation.JsonView;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
-import lombok.Builder;
-import lombok.Data;
-import lombok.ToString;
+import lombok.*;
 
 /**
  * demo
@@ -20,6 +18,8 @@ import lombok.ToString;
 @Data
 @Builder
 @ToString
+@AllArgsConstructor
+@NoArgsConstructor
 public class UserDto {
 
     @NotNull

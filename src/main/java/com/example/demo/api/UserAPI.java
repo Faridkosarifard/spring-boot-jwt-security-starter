@@ -23,6 +23,6 @@ public class UserAPI {
 
     @GetMapping("/")
     public User get() {
-        return userRepository.findByUserName(SecurityContextHolder.getContext().getAuthentication().getPrincipal().toString());
+        return userRepository.findByUsername(SecurityContextHolder.getContext().getAuthentication().getPrincipal().toString());
     }
 }

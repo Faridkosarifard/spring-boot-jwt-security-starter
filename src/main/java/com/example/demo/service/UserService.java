@@ -89,7 +89,7 @@ public class UserService implements IUserService, UserDetailsService {
         user.setEmail(accountDto.getEmail());
         user.setBirthDay(accountDto.getBirthDay());
         user.setPhoneNumber(accountDto.getPhoneNumber());
-        user.setUserName(accountDto.getUsername());
+        user.setUsername(accountDto.getUsername());
         user.setUsing2FA(accountDto.isUse2FA());
         user.setRoles(Collections.singletonList(roleRepository.findByName("ROLE_USER")));
         return userRepository.save(user);
@@ -227,7 +227,7 @@ public class UserService implements IUserService, UserDetailsService {
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
 
-        User userEntity = userRepository.findByUserName(username);
+        User userEntity = userRepository.findByUsername(username);
 
         Collection<Role> userRoles = userEntity.getRoles();
         List<GrantedAuthority> authorities = userRoles.stream()

@@ -3,7 +3,7 @@ url: http://localhost:8086/user/registration
 {
     "firstName": "Jane",
     "lastName": "Doe",
-    "userName": "farid",
+    "username": "farid",
     "password": "example-password",
     "email": "user@example.com",
     "isUsing2FA": "false"
@@ -14,7 +14,7 @@ url: http://localhost:8086/login
 
 {
 
-    "userName": "farid",
+    "username": "farid",
     "password": "example-password"
 
 }
