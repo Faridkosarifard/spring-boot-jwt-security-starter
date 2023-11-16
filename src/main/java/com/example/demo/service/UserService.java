@@ -107,6 +107,11 @@ public class UserService implements IUserService, UserDetailsService {
     }
 
     @Override
+    public User findOne(UserDto userDto) {
+        return userRepository.findByUsername(userDto.getUsername());
+    }
+
+    @Override
     public void saveRegisteredUser(User user) {
         userRepository.save(user);
     }

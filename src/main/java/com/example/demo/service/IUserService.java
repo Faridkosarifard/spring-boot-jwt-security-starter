@@ -19,6 +19,8 @@ public interface IUserService {
 
     User getUser(String verificationToken);
 
+    User findOne(UserDto userDto);
+
     void saveRegisteredUser(User user);
 
     void deleteUser(User user);

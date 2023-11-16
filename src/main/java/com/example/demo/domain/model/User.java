@@ -1,5 +1,8 @@
 package com.example.demo.domain.model;
 
+import com.example.demo.domain.view.Views;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonView;
 import jakarta.persistence.*;
 import lombok.*;
 import org.jboss.aerogear.security.otp.api.Base32;
@@ -23,32 +26,50 @@ public class User implements Serializable {
     @Id
     @Column(unique = true, nullable = false)
     @GeneratedValue(strategy = GenerationType.AUTO)
+
+    @JsonIgnore
     private Long id;
 
+    @JsonView(Views.Login.class)
     private String firstName;
 
+    @JsonView(Views.Login.class)
     private String lastName;
 
+    @JsonView(Views.Login.class)
     private String username;
 
+    @JsonView(Views.Login.class)
     private String email;
 
     @Column(length = 60)
+    @JsonView(Views.User.class)
     private String password;
 
+    @JsonView(Views.User.class)
     private boolean enabled;
 
+    @JsonView(Views.User.class)
     private boolean isUsing2FA;
 
+    @JsonView(Views.User.class)
     private String secret;
 
+    @JsonView(Views.User.class)
     private Date expiryDate;
 
+    @JsonView(Views.User.class)
     private String birthDay;
 
+    @JsonView(Views.User.class)
     private String phoneNumber;
 
+    @Transient
+    @JsonView(Views.Login.class)
+    private String token;
+
     @ManyToMany(fetch = FetchType.EAGER)
+    @JsonView(Views.User.class)
     @JoinTable(name = "users_roles", joinColumns = @JoinColumn(name = "user_id", referencedColumnName = "id"), inverseJoinColumns = @JoinColumn(name = "role_id", referencedColumnName = "id"))
     private Collection<Role> roles;
 

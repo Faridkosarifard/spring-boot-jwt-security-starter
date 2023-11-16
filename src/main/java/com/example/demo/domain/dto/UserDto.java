@@ -33,7 +33,7 @@ public class UserDto {
     private String lastName;
 
     @ValidPassword
-    @JsonView({Views.Login.class, Views.Registration.class})
+    @JsonView({Views.Registration.class, Views.Login.class})
     private String password;
 
     @ValidEmail

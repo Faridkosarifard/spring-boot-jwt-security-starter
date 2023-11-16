@@ -160,7 +160,6 @@ public class RegistrationRestController {
     }
 
 
-
     @PostMapping("/user/changePassword")
     @JsonView(Views.ChangePassword.class)
     public ResponseEntity<HttpStatus> changePassword(@RequestBody PasswordDto passwordDto) {
@@ -178,9 +177,12 @@ public class RegistrationRestController {
 
     @PostMapping("/user/login")
     @JsonView(Views.Login.class)
-    public String login(@RequestBody UserDto userEntity) {
+    public ResponseEntity<User> login(@RequestBody UserDto userEntity) {
         authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(userEntity.getUsername(), userEntity.getPassword()));
-        return tokenProvider.getToken(userEntity.getUsername());
+        String token = tokenProvider.getToken(userEntity.getUsername());
+        User user = userService.findOne(userEntity);
+        user.setToken(token);
+        return ResponseEntity.ok(user);
     }
 
     private MimeMessage constructResetTokenEmail(final String contextPath, final String token, final User user) {
