@@ -1,8 +1,8 @@
 package com.example.demo.sping;
 
-import com.example.demo.domain.dao.PrivilegeRepository;
-import com.example.demo.domain.dao.RoleRepository;
-import com.example.demo.domain.dao.UserRepository;
+import com.example.demo.repository.PrivilegeRepository;
+import com.example.demo.repository.RoleRepository;
+import com.example.demo.repository.UserRepository;
 import com.example.demo.domain.model.Privilege;
 import com.example.demo.domain.model.Role;
 import com.example.demo.domain.model.User;

@@ -1,6 +1,6 @@
 package com.example.demo.sping;
 
-import com.example.demo.domain.dao.PasswordResetTokenRepository;
+import com.example.demo.repository.PasswordResetTokenRepository;
 import com.example.demo.domain.model.PasswordResetToken;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;

@@ -1,6 +1,6 @@
 package com.example.demo.api;
 
-import com.example.demo.domain.dao.UserRepository;
+import com.example.demo.repository.UserRepository;
 import com.example.demo.domain.model.User;
 
 import org.springframework.security.core.context.SecurityContextHolder;

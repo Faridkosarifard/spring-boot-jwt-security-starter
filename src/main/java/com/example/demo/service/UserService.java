@@ -1,9 +1,9 @@
 package com.example.demo.service;
 
-import com.example.demo.domain.dao.PasswordResetTokenRepository;
-import com.example.demo.domain.dao.RoleRepository;
-import com.example.demo.domain.dao.UserRepository;
-import com.example.demo.domain.dao.VerificationTokenRepository;
+import com.example.demo.repository.PasswordResetTokenRepository;
+import com.example.demo.repository.RoleRepository;
+import com.example.demo.repository.UserRepository;
+import com.example.demo.repository.VerificationTokenRepository;
 import com.example.demo.domain.model.PasswordResetToken;
 
 import com.example.demo.domain.model.Role;

@@ -1,4 +1,4 @@
-package com.example.demo.domain.dao;
+package com.example.demo.repository;
 
 import com.example.demo.domain.model.PasswordResetToken;
 import com.example.demo.domain.model.User;
