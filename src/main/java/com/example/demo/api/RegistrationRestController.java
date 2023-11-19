@@ -44,6 +44,7 @@ import java.util.stream.Collectors;
  */
 @RestController
 @Slf4j
+@RequestMapping("/user")
 public class RegistrationRestController {
 
     private final IUserService userService;
@@ -65,7 +66,7 @@ public class RegistrationRestController {
         this.env = env;
     }
 
-    @PostMapping("/user/registration")
+    @PostMapping("/registration")
     @JsonView(Views.Registration.class)
     public ResponseEntity<HttpStatus> registerUserAccount(@RequestBody final UserDto accountDto, final HttpServletRequest request) {
         try {
@@ -85,7 +86,7 @@ public class RegistrationRestController {
         }
     }
 
-    @GetMapping("/registrationConfirm")
+    @GetMapping("/registration-confirm")
     public Object confirmRegistration(@RequestParam("token") final String token) throws UnsupportedEncodingException {
         final String result = userService.validateVerificationToken(token);
         if (result.equals("valid")) {
@@ -100,7 +101,7 @@ public class RegistrationRestController {
         return HttpStatus.NOT_ACCEPTABLE;
     }
 
-    @PostMapping("/user/resetPassword")
+    @PostMapping("/forget-password")
     @JsonView(Views.ResetPassword.class)
     public ResponseEntity<HttpStatus> resetPassword(final HttpServletRequest request, @RequestBody final UserDto userDto) {
         final User user = userService.findUserByEmail(userDto.getEmail());
@@ -123,8 +124,8 @@ public class RegistrationRestController {
         }
     }
 
-    @GetMapping("/user/forgetPassword")
-    public Object showChangePasswordPage(@RequestParam("token") final String token) {
+    @PostMapping("/reset-password")
+    public Object showChangePasswordPage(@RequestBody String token) {
         try {
             final String result = securityUserService.validatePasswordResetToken(token);
             if (result != null) {
@@ -142,7 +143,7 @@ public class RegistrationRestController {
         }
     }
 
-    @PostMapping("/user/savePassword")
+    @PostMapping("/save-password")
     @JsonView(Views.SavePassword.class)
     public ResponseEntity<HttpStatus> savePassword(final Locale locale, @RequestBody PasswordDto passwordDto) {
         final String result = securityUserService.validatePasswordResetToken(passwordDto.getToken());
@@ -160,7 +161,7 @@ public class RegistrationRestController {
     }
 
 
-    @PostMapping("/user/changePassword")
+    @PostMapping("/change-password")
     @JsonView(Views.ChangePassword.class)
     public ResponseEntity<HttpStatus> changePassword(@RequestBody PasswordDto passwordDto) {
         if (passwordDto.getNewPassword() != null && passwordDto.getOldPassword() != null && passwordDto.getEmail() != null) {
@@ -175,7 +176,7 @@ public class RegistrationRestController {
         }
     }
 
-    @PostMapping("/user/login")
+    @PostMapping("/login")
     @JsonView(Views.Login.class)
     public ResponseEntity<User> login(@RequestBody UserDto userEntity) {
         authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(userEntity.getUsername(), userEntity.getPassword()));
