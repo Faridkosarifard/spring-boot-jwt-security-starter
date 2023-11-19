@@ -8,7 +8,7 @@ import com.example.demo.domain.model.User;
 import com.example.demo.domain.view.Views;
 import com.example.demo.registration.OnRegistrationCompleteEvent;
 import com.example.demo.service.IUserService;
-import com.example.demo.sping.ISecurityUserService;
+import com.example.demo.spring.ISecurityUserService;
 import com.example.demo.domain.dto.PasswordDto;
 import com.example.demo.domain.dto.UserDto;
 import com.example.demo.exception.UserAlreadyExistException;

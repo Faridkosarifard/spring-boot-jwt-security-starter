@@ -1,4 +1,4 @@
-package com.example.demo.sping;
+package com.example.demo.spring;
 
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;

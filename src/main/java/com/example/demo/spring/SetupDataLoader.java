@@ -1,4 +1,4 @@
-package com.example.demo.sping;
+package com.example.demo.spring;
 
 import com.example.demo.repository.PrivilegeRepository;
 import com.example.demo.repository.RoleRepository;

@@ -1,6 +1,6 @@
 package com.example.demo.domain.dto;
 
-import com.example.demo.Validation.ValidPassword;
+import com.example.demo.validation.ValidPassword;
 import com.example.demo.domain.view.Views;
 import com.fasterxml.jackson.annotation.JsonView;
 import lombok.*;
