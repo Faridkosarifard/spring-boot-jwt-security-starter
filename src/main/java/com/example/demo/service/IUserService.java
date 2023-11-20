@@ -51,4 +51,6 @@ public interface IUserService {
 
     User updateUser2FA(boolean use2FA);
 
+    Boolean checkIfValidPhoneNumber(String phoneNumber);
+
 }

@@ -230,6 +230,12 @@ public class UserService implements IUserService, UserDetailsService {
     }
 
     @Override
+    public Boolean checkIfValidPhoneNumber(String phoneNumber) {
+        User user= userRepository.findByPhoneNumber(phoneNumber);
+        return user.getPhoneNumber() != null;
+    }
+
+    @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
 
         User userEntity = userRepository.findByUsername(username);

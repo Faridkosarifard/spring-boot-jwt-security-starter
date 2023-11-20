@@ -51,8 +51,7 @@ public class RegistrationListener implements ApplicationListener<OnRegistrationC
     private MimeMessage constructEmailMessage(final OnRegistrationCompleteEvent event, final User user, final String token) {
         final String recipientAddress = user.getEmail();
         final String subject = "تایید عضویت";
-        final String confirmationUrl = event.getAppUrl() + "/registrationConfirm?token=" + token;
-        //final String message = messages.getMessage("message.regSuccLink", null, "ثبت نام شا با موفقیت انجام شده است. برای فعال سازی و استفاده از امکانات سایت لطفا بر روی لینک زیر کلیک کنید.", event.getLocale());
+        final String confirmationUrl = event.getAppUrl() + "/user/registration-confirm?token=" + token;
         MimeMessage email = mailSender.createMimeMessage();
         email.setRecipients(MimeMessage.RecipientType.TO, recipientAddress);
         email.setSubject(subject);

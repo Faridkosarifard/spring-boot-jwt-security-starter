@@ -36,6 +36,7 @@ import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.servlet.view.RedirectView;
 
 import java.io.UnsupportedEncodingException;
 import java.util.*;
@@ -115,7 +116,7 @@ public class RegistrationAPI {
 
     @GetMapping("/validation")
     @Hidden
-    public Object showChangePasswordPage(@RequestParam("token") final String token) {
+    public Object showChangePasswordPage(@RequestParam("token") final String token,final HttpServletRequest request) {
         try {
             final String result = securityUserService.validatePasswordResetToken(token);
             if (result != null) {
@@ -124,8 +125,7 @@ public class RegistrationAPI {
                 return ResponseEntity.status(HttpStatus.NOT_ACCEPTABLE).build();
             } else {
                 log.info("Password Token verified and Redirect to Reset Password Page");
-                //TODO REDIRECT TO CHANGE PASSWORD PAGE WITH TOKEN
-                return ResponseEntity.status(HttpStatus.ACCEPTED).build();
+                return new RedirectView(getAppUrl(request)+"/aut/rest-password?token="+token);
             }
         } catch (Exception e) {
             log.error("An error occurred." + e.getMessage());
@@ -158,7 +158,7 @@ public class RegistrationAPI {
 
     @PostMapping("/reset-password")
     @JsonView(Views.SavePassword.class)
-    public ResponseEntity<HttpStatus> savePassword(final Locale locale, @RequestBody PasswordDto passwordDto) {
+    public ResponseEntity<HttpStatus> savePassword(@RequestBody PasswordDto passwordDto) {
         final String result = securityUserService.validatePasswordResetToken(passwordDto.getToken());
         if (result != null) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
@@ -179,11 +179,13 @@ public class RegistrationAPI {
     public ResponseEntity<HttpStatus> changePassword(@RequestBody PasswordDto passwordDto) {
         if (passwordDto.getNewPassword() != null && passwordDto.getOldPassword() != null && passwordDto.getEmail() != null) {
             User user = userService.findUserByEmail(passwordDto.getEmail());
-            if (!userService.checkIfValidOldPassword(user, passwordDto.getOldPassword())) {
-                return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
-            }
-            userService.changeUserPassword(user, passwordDto.getNewPassword());
-            return ResponseEntity.status(HttpStatus.OK).build();
+            if (user!= null) {
+                if (!userService.checkIfValidOldPassword(user, passwordDto.getOldPassword())) {
+                    return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+                }
+                userService.changeUserPassword(user, passwordDto.getNewPassword());
+                return ResponseEntity.status(HttpStatus.OK).build();
+            }else return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
         } else {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
         }
@@ -197,6 +199,15 @@ public class RegistrationAPI {
         User user = userService.findOne(userEntity);
         user.setToken(token);
         return ResponseEntity.ok(user);
+    }
+
+    @GetMapping("/get-by-mobile")
+    public ResponseEntity<HttpStatus> getByMobileNumber(@RequestBody String phoneNumber){
+        if (userService.checkIfValidPhoneNumber(phoneNumber)){
+            return ResponseEntity.status(HttpStatus.ACCEPTED).build();
+        }else {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+        }
     }
 
     private MimeMessage constructResetTokenEmail(final String contextPath, final String token, final User user) {
