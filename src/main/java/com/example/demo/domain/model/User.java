@@ -4,7 +4,9 @@ import com.example.demo.domain.view.Views;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonView;
 import jakarta.persistence.*;
-import lombok.*;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
 import org.jboss.aerogear.security.otp.api.Base32;
 
 import java.io.Serializable;

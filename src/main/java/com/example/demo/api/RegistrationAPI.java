@@ -13,6 +13,11 @@ import com.example.demo.domain.dto.PasswordDto;
 import com.example.demo.domain.dto.UserDto;
 import com.example.demo.exception.UserAlreadyExistException;
 import com.fasterxml.jackson.annotation.JsonView;
+import io.swagger.v3.oas.annotations.Hidden;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.mail.internet.MimeMessage;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.SneakyThrows;
@@ -45,7 +50,8 @@ import java.util.stream.Collectors;
 @RestController
 @Slf4j
 @RequestMapping("/user")
-public class RegistrationRestController {
+@Tag(name = "User Registration", description = "the registration API for users")
+public class RegistrationAPI {
 
     private final IUserService userService;
     private final TokenProvider tokenProvider;
@@ -57,7 +63,7 @@ public class RegistrationRestController {
     @Autowired
     private ISecurityUserService securityUserService;
 
-    public RegistrationRestController(IUserService userService, TokenProvider tokenProvider, AuthenticationManager authenticationManager, JavaMailSender mailSender, ApplicationEventPublisher eventPublisher, Environment env, ISecurityUserService securityUserService) {
+    public RegistrationAPI(IUserService userService, TokenProvider tokenProvider, AuthenticationManager authenticationManager, JavaMailSender mailSender, ApplicationEventPublisher eventPublisher, Environment env, ISecurityUserService securityUserService) {
         this.userService = userService;
         this.tokenProvider = tokenProvider;
         this.authenticationManager = authenticationManager;
@@ -66,6 +72,12 @@ public class RegistrationRestController {
         this.env = env;
     }
 
+    @Operation(description = "Registration")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Successfully retrieved"),
+            @ApiResponse(responseCode = "406", description = "Not Acceptable"),
+            @ApiResponse(responseCode = "409", description = "Conflict")
+    })
     @PostMapping("/registration")
     @JsonView(Views.Registration.class)
     public ResponseEntity<HttpStatus> registerUserAccount(@RequestBody final UserDto accountDto, final HttpServletRequest request) {
@@ -101,6 +113,26 @@ public class RegistrationRestController {
         return HttpStatus.NOT_ACCEPTABLE;
     }
 
+    @GetMapping("/validation")
+    @Hidden
+    public Object showChangePasswordPage(@RequestParam("token") final String token) {
+        try {
+            final String result = securityUserService.validatePasswordResetToken(token);
+            if (result != null) {
+                log.error("Token {} not valid", token);
+                //TODO REDIRECT TO ERROR PAGE AND SEND THE MSG TO UI
+                return ResponseEntity.status(HttpStatus.NOT_ACCEPTABLE).build();
+            } else {
+                log.info("Password Token verified and Redirect to Reset Password Page");
+                //TODO REDIRECT TO CHANGE PASSWORD PAGE WITH TOKEN
+                return ResponseEntity.status(HttpStatus.ACCEPTED).build();
+            }
+        } catch (Exception e) {
+            log.error("An error occurred." + e.getMessage());
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+        }
+    }
+
     @PostMapping("/forget-password")
     @JsonView(Views.ResetPassword.class)
     public ResponseEntity<HttpStatus> resetPassword(final HttpServletRequest request, @RequestBody final UserDto userDto) {
@@ -125,25 +157,6 @@ public class RegistrationRestController {
     }
 
     @PostMapping("/reset-password")
-    public Object showChangePasswordPage(@RequestBody String token) {
-        try {
-            final String result = securityUserService.validatePasswordResetToken(token);
-            if (result != null) {
-                log.error("Token {} not valid", token);
-                //TODO REDIRECT TO ERROR PAGE AND SEND THE MSG TO UI
-                return ResponseEntity.status(HttpStatus.NOT_ACCEPTABLE).build();
-            } else {
-                log.info("Password Token verified and Redirect to Reset Password Page");
-                //TODO REDIRECT TO CHANGE PASSWORD PAGE WITH TOKEN
-                return ResponseEntity.status(HttpStatus.ACCEPTED).build();
-            }
-        } catch (Exception e) {
-            log.error("An error occurred." + e.getMessage());
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
-        }
-    }
-
-    @PostMapping("/save-password")
     @JsonView(Views.SavePassword.class)
     public ResponseEntity<HttpStatus> savePassword(final Locale locale, @RequestBody PasswordDto passwordDto) {
         final String result = securityUserService.validatePasswordResetToken(passwordDto.getToken());
@@ -187,7 +200,7 @@ public class RegistrationRestController {
     }
 
     private MimeMessage constructResetTokenEmail(final String contextPath, final String token, final User user) {
-        final String url = contextPath + "/user/changePassword?token=" + token;
+        final String url = contextPath + "/user/validation?token=" + token;
         final String message = MailHtmlContent.getInstance().forgetPasswordHtmlContent(user.getFirstName(), user.getLastName(), url);
         return constructEmail("فراموشی رمز عبور", message, user);
     }

@@ -26,3 +26,7 @@ spring:
 jwt:
   secret-key: REDACTED_JWT_SECRET
   issuer: http://localhost
+
+springdoc:
+  swagger-ui:
+    default-models-expand-depth: -1

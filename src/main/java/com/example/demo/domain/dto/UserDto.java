@@ -1,8 +1,8 @@
 package com.example.demo.domain.dto;
 
+import com.example.demo.domain.view.Views;
 import com.example.demo.validation.ValidEmail;
 import com.example.demo.validation.ValidPassword;
-import com.example.demo.domain.view.Views;
 import com.fasterxml.jackson.annotation.JsonView;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;

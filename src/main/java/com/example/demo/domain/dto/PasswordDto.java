@@ -1,9 +1,12 @@
 package com.example.demo.domain.dto;
 
-import com.example.demo.validation.ValidPassword;
 import com.example.demo.domain.view.Views;
+import com.example.demo.validation.ValidPassword;
 import com.fasterxml.jackson.annotation.JsonView;
-import lombok.*;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 
 /**
  * demo
