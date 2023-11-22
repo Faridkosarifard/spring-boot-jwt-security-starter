@@ -64,7 +64,7 @@ public class RegistrationAPI {
     @Autowired
     private ISecurityUserService securityUserService;
 
-    public RegistrationAPI(IUserService userService, TokenProvider tokenProvider, AuthenticationManager authenticationManager, JavaMailSender mailSender, ApplicationEventPublisher eventPublisher, Environment env, ISecurityUserService securityUserService) {
+    public RegistrationAPI(IUserService userService, TokenProvider tokenProvider, AuthenticationManager authenticationManager, JavaMailSender mailSender, ApplicationEventPublisher eventPublisher, Environment env) {
         this.userService = userService;
         this.tokenProvider = tokenProvider;
         this.authenticationManager = authenticationManager;
@@ -202,8 +202,9 @@ public class RegistrationAPI {
     }
 
     @GetMapping("/get-by-mobile")
-    public ResponseEntity<HttpStatus> getByMobileNumber(@RequestBody String phoneNumber){
-        if (userService.checkIfValidPhoneNumber(phoneNumber)){
+    @JsonView(Views.GetPhoneNumber.class)
+    public ResponseEntity<HttpStatus> getByMobileNumber(@RequestBody UserDto userDto){
+        if (Boolean.TRUE.equals(userService.checkIfValidPhoneNumber(userDto.getPhoneNumber()))){
             return ResponseEntity.status(HttpStatus.ACCEPTED).build();
         }else {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
@@ -238,12 +239,11 @@ public class RegistrationAPI {
                 .map(Role::getPrivileges)
                 .flatMap(Collection::stream)
                 .distinct()
-                .collect(Collectors.toList());
+                .toList();
 
         List<GrantedAuthority> authorities = privileges.stream()
                 .map(p -> new SimpleGrantedAuthority(p.getName()))
                 .collect(Collectors.toList());
-
         Authentication authentication = new UsernamePasswordAuthenticationToken(user, null, authorities);
         SecurityContextHolder.getContext().setAuthentication(authentication);
     }

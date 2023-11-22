@@ -47,7 +47,7 @@ public class UserDto {
 
     @NotNull
     @Size(min=11,max = 11)
-    @JsonView(Views.User.class)
+    @JsonView({Views.User.class, Views.GetPhoneNumber.class})
     private String phoneNumber;
 
     @JsonView({Views.Login.class, Views.Registration.class})

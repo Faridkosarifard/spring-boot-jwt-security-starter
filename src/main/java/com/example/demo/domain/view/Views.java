@@ -29,4 +29,7 @@ public class Views {
     public interface ChangePassword extends Public {
     }
 
+    public interface GetPhoneNumber extends Public {
+    }
+
 }
