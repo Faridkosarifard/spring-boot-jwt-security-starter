@@ -15,6 +15,7 @@ import com.example.demo.exception.UserAlreadyExistException;
 import com.fasterxml.jackson.annotation.JsonView;
 import io.swagger.v3.oas.annotations.Hidden;
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -116,7 +117,7 @@ public class RegistrationAPI {
 
     @GetMapping("/validation")
     @Hidden
-    public Object showChangePasswordPage(@RequestParam("token") final String token,final HttpServletRequest request) {
+    public Object showChangePasswordPage(@RequestParam("token") final String token, final HttpServletRequest request) {
         try {
             final String result = securityUserService.validatePasswordResetToken(token);
             if (result != null) {
@@ -125,7 +126,7 @@ public class RegistrationAPI {
                 return ResponseEntity.status(HttpStatus.NOT_ACCEPTABLE).build();
             } else {
                 log.info("Password Token verified and Redirect to Reset Password Page");
-                return new RedirectView(getAppUrl(request)+"/aut/rest-password?token="+token);
+                return new RedirectView(getAppUrl(request) + "generator-next.vercel.app/aut/rest-password?token=" + token);
             }
         } catch (Exception e) {
             log.error("An error occurred." + e.getMessage());
@@ -203,7 +204,7 @@ public class RegistrationAPI {
 
     @GetMapping("/get-by-mobile")
     @JsonView(Views.GetPhoneNumber.class)
-    public ResponseEntity<HttpStatus> getByMobileNumber(@RequestBody UserDto userDto){
+    public ResponseEntity<HttpStatus> getByMobileNumber(@Parameter UserDto userDto){
         if (Boolean.TRUE.equals(userService.checkIfValidPhoneNumber(userDto.getPhoneNumber()))){
             return ResponseEntity.status(HttpStatus.ACCEPTED).build();
         }else {

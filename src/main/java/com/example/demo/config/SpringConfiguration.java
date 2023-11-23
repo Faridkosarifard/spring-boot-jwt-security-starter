@@ -7,7 +7,7 @@ import org.springframework.context.annotation.Configuration;
 /**
  * Created by Milad Tehrany
  * Date: 11/14/23
- * Time: 1:38 AM
+ * Time: 1:38 AM
  */
 
 @Configuration
