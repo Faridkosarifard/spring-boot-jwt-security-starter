@@ -15,7 +15,7 @@ spring:
     password: REDACTED_PASSWORD
   jpa:
     hibernate:
-      ddl-auto: create-drop
+      ddl-auto: update
 
     show-sql: true
     database-platform: org.hibernate.dialect.Oracle12cDialect
