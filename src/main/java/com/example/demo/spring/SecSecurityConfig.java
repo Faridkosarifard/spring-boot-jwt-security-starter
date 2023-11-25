@@ -70,10 +70,25 @@ public class SecSecurityConfig {
     }
 
     @Bean
-    FilterRegistrationBean<Filter> crossOrigin() {
-        UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
-        source.registerCorsConfiguration("/**", new CorsConfiguration().applyPermitDefaultValues());
-        return new FilterRegistrationBean<>(new CorsFilter(source));
+    public SecurityFilterChain securityFilterChain(HttpSecurity httpSecurity) throws Exception {
+        return httpSecurity
+                .authenticationProvider(authenticationProvider())
+                .addFilterBefore(
+                        securityFilter, UsernamePasswordAuthenticationFilter.class)
+                .cors(
+                        Customizer.withDefaults())
+                .csrf(AbstractHttpConfigurer::disable)
+                .authorizeHttpRequests(authorize -> {
+                    authorize
+                            .requestMatchers("/api/**")
+                            .authenticated()
+                            .requestMatchers("/admin/**")
+                            .hasRole("ADMIN")
+                            .requestMatchers("/users/**")
+                            .hasRole("USER")
+                            .anyRequest().permitAll();
+
+                }).sessionManagement(manager -> manager.sessionCreationPolicy(STATELESS)).build();
     }
 
     @Bean
@@ -88,27 +103,6 @@ public class SecSecurityConfig {
         return urlBasedCorsConfigurationSource;
     }
 
-    @Bean
-    public SecurityFilterChain securityFilterChain(HttpSecurity httpSecurity) throws Exception {
-        httpSecurity.authenticationProvider(authenticationProvider()).addFilterBefore(
-                securityFilter, UsernamePasswordAuthenticationFilter.class);
-        httpSecurity.cors(
-                Customizer.withDefaults())
-                .csrf(AbstractHttpConfigurer::disable)
-                .authorizeHttpRequests(authorize -> {
-                    authorize
-                            .requestMatchers("/api/**")
-                            .authenticated()
-                            .requestMatchers("/admin/**")
-                            .hasRole("ADMIN")
-                            .requestMatchers("/users/**")
-                            .hasRole("USER")
-                            .anyRequest().permitAll();
-
-                });
-        httpSecurity.sessionManagement(manager -> manager.sessionCreationPolicy(STATELESS));
-        return httpSecurity.build();
-    }
    /* @Bean
     public WebSecurityCustomizer webSecurityCustomizer() {
         return (web) -> web.ignoring().requestMatchers("/images/**", "/js/**", "/webjars/**");
