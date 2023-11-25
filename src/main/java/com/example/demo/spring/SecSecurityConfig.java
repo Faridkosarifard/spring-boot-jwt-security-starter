@@ -69,14 +69,21 @@ public class SecSecurityConfig {
         return new SessionRegistryImpl();
     }
 
+    /*@Bean
+    FilterRegistrationBean<Filter> crossOrigin() {
+        UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
+        source.registerCorsConfiguration("/**", new CorsConfiguration().applyPermitDefaultValues());
+        return new FilterRegistrationBean<>(new CorsFilter(source));
+    }*/
+
+
+
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity httpSecurity) throws Exception {
-        return httpSecurity
-                .authenticationProvider(authenticationProvider())
-                .addFilterBefore(
-                        securityFilter, UsernamePasswordAuthenticationFilter.class)
-                .cors(
-                        Customizer.withDefaults())
+        httpSecurity.authenticationProvider(authenticationProvider()).addFilterBefore(
+                securityFilter, UsernamePasswordAuthenticationFilter.class);
+        httpSecurity.cors(
+                Customizer.withDefaults())
                 .csrf(AbstractHttpConfigurer::disable)
                 .authorizeHttpRequests(authorize -> {
                     authorize
@@ -88,21 +95,10 @@ public class SecSecurityConfig {
                             .hasRole("USER")
                             .anyRequest().permitAll();
 
-                }).sessionManagement(manager -> manager.sessionCreationPolicy(STATELESS)).build();
+                });
+        httpSecurity.sessionManagement(manager -> manager.sessionCreationPolicy(STATELESS));
+        return httpSecurity.build();
     }
-
-    @Bean
-    CorsConfigurationSource corsConfigurationSource() {
-        CorsConfiguration corsConfiguration = new CorsConfiguration();
-        corsConfiguration.addAllowedOrigin("*");
-        corsConfiguration.setAllowedMethods(Collections.singletonList("*"));
-        corsConfiguration.setAllowedHeaders(Collections.singletonList("*"));
-
-        UrlBasedCorsConfigurationSource urlBasedCorsConfigurationSource = new UrlBasedCorsConfigurationSource();
-        urlBasedCorsConfigurationSource.registerCorsConfiguration("/**", corsConfiguration);
-        return urlBasedCorsConfigurationSource;
-    }
-
    /* @Bean
     public WebSecurityCustomizer webSecurityCustomizer() {
         return (web) -> web.ignoring().requestMatchers("/images/**", "/js/**", "/webjars/**");
@@ -122,4 +118,15 @@ public class SecSecurityConfig {
         return authProvider;
     }
 
+
+    @Bean
+    CorsConfigurationSource corsConfigurationSource() {
+        CorsConfiguration configuration = new CorsConfiguration();
+        configuration.setAllowedOrigins(Arrays.asList("*"));
+        configuration.setAllowedMethods(Arrays.asList("*"));
+        configuration.setAllowedHeaders(Arrays.asList("*"));
+        UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
+        source.registerCorsConfiguration("/**", configuration);
+        return source;
+    }
 }

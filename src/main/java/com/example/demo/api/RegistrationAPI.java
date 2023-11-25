@@ -126,7 +126,7 @@ public class RegistrationAPI {
                 return ResponseEntity.status(HttpStatus.NOT_ACCEPTABLE).build();
             } else {
                 log.info("Password Token verified and Redirect to Reset Password Page");
-                return new RedirectView(getAppUrl(request) + "generator-next.vercel.app/aut/rest-password?token=" + token);
+                return new RedirectView(getAppUrl(request)+"/aut/rest-password?token="+token);
             }
         } catch (Exception e) {
             log.error("An error occurred." + e.getMessage());
@@ -245,6 +245,7 @@ public class RegistrationAPI {
         List<GrantedAuthority> authorities = privileges.stream()
                 .map(p -> new SimpleGrantedAuthority(p.getName()))
                 .collect(Collectors.toList());
+
         Authentication authentication = new UsernamePasswordAuthenticationToken(user, null, authorities);
         SecurityContextHolder.getContext().setAuthentication(authentication);
     }
