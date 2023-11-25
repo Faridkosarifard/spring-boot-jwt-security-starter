@@ -30,3 +30,9 @@ jwt:
 springdoc:
   swagger-ui:
     default-models-expand-depth: -1
+
+management:
+  endpoints:
+    web:
+      cors:
+        allowed-origins: "*"
