@@ -53,4 +53,6 @@ public interface IUserService {
 
     Boolean checkIfValidPhoneNumber(String phoneNumber);
 
+    User getUserInfo(User user);
+
 }

@@ -236,6 +236,17 @@ public class UserService implements IUserService, UserDetailsService {
     }
 
     @Override
+    public User getUserInfo(User user) {
+        if (user.getId()!= null)
+            return userRepository.findUserById(user.getId());
+        else if (user.getUsername() != null) {
+            return userRepository.findByUsername(user.getUsername());
+        }
+        return null;
+    }
+
+
+    @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
 
         User userEntity = userRepository.findByUsername(username);

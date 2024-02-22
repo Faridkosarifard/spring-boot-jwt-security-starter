@@ -4,6 +4,7 @@ import com.auth0.jwt.JWT;
 import com.auth0.jwt.algorithms.Algorithm;
 import com.auth0.jwt.exceptions.JWTCreationException;
 import com.auth0.jwt.exceptions.JWTVerificationException;
+import com.example.demo.domain.model.User;
 import com.example.demo.repository.UserRepository;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -31,14 +32,19 @@ public class TokenProvider {
 
     public String getToken(String username) throws IllegalArgumentException, JWTCreationException {
         log.info("getToken");
-        String secretKey = userRepository.findByUsername(username).getSecret();
+        User user= userRepository.findByUsername(username);
+        String secretKey = user.getSecret();
+
         System.out.println(secretKey);
         return JWT.create()
                 .withClaim("username", username)
+                .withClaim("id",user.getId())
                 .withIssuedAt(new Date())
                 .withIssuer(issuer)
                 .sign(Algorithm.HMAC256(secretKey));
     }
+
+
 
     public String verifyToken(String token) throws JWTVerificationException {
         log.info("verifyToken");

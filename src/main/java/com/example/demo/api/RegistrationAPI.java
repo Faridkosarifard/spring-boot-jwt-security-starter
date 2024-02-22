@@ -19,6 +19,7 @@ import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.annotation.security.RolesAllowed;
 import jakarta.mail.internet.MimeMessage;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.SneakyThrows;
@@ -201,6 +202,13 @@ public class RegistrationAPI {
         user.setToken(token);
         return ResponseEntity.ok(user);
     }
+
+    @GetMapping("/get-info")
+    public ResponseEntity<User> getUserInfo(@RequestBody User userEntity){
+        User user=  userService.getUserInfo(userEntity);
+        return ResponseEntity.ok(user);
+    }
+
 
     @GetMapping("/get-by-mobile")
     @JsonView(Views.GetPhoneNumber.class)

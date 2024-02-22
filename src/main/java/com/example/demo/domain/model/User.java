@@ -1,7 +1,9 @@
 package com.example.demo.domain.model;
 
 import com.example.demo.domain.view.Views;
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import com.fasterxml.jackson.annotation.JsonView;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
@@ -28,8 +30,6 @@ public class User implements Serializable {
     @Id
     @Column(unique = true, nullable = false)
     @GeneratedValue(strategy = GenerationType.AUTO)
-
-    @JsonIgnore
     private Long id;
 
     @JsonView(Views.Login.class)
@@ -69,7 +69,7 @@ public class User implements Serializable {
     @Transient
     @JsonView(Views.Login.class)
     private String token;
-
+    @JsonBackReference
     @ManyToMany(fetch = FetchType.EAGER)
     @JsonView(Views.User.class)
     @JoinTable(name = "users_roles", joinColumns = @JoinColumn(name = "user_id", referencedColumnName = "id"), inverseJoinColumns = @JoinColumn(name = "role_id", referencedColumnName = "id"))
