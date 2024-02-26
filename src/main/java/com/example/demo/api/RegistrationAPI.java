@@ -2,16 +2,17 @@ package com.example.demo.api;
 
 import com.example.demo.common.MailHtmlContent;
 import com.example.demo.common.TokenProvider;
+import com.example.demo.domain.dto.PasswordDto;
+import com.example.demo.domain.dto.UserDto;
+import com.example.demo.domain.dto.UserInfo;
 import com.example.demo.domain.model.Privilege;
 import com.example.demo.domain.model.Role;
 import com.example.demo.domain.model.User;
 import com.example.demo.domain.view.Views;
+import com.example.demo.exception.UserAlreadyExistException;
 import com.example.demo.registration.OnRegistrationCompleteEvent;
 import com.example.demo.service.IUserService;
 import com.example.demo.spring.ISecurityUserService;
-import com.example.demo.domain.dto.PasswordDto;
-import com.example.demo.domain.dto.UserDto;
-import com.example.demo.exception.UserAlreadyExistException;
 import com.fasterxml.jackson.annotation.JsonView;
 import io.swagger.v3.oas.annotations.Hidden;
 import io.swagger.v3.oas.annotations.Operation;
@@ -19,7 +20,6 @@ import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
-import jakarta.annotation.security.RolesAllowed;
 import jakarta.mail.internet.MimeMessage;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.SneakyThrows;
@@ -41,7 +41,10 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.view.RedirectView;
 
 import java.io.UnsupportedEncodingException;
-import java.util.*;
+import java.util.Collection;
+import java.util.List;
+import java.util.Optional;
+import java.util.UUID;
 import java.util.stream.Collectors;
 
 /**
@@ -203,10 +206,10 @@ public class RegistrationAPI {
         return ResponseEntity.ok(user);
     }
 
-    @GetMapping("/get-info")
-    public ResponseEntity<User> getUserInfo(@RequestBody User userEntity){
-        User user=  userService.getUserInfo(userEntity);
-        return ResponseEntity.ok(user);
+    @GetMapping("/get-info/{userId}")
+    public ResponseEntity<UserInfo> getUserInfo(@PathVariable String userId) {
+        UserInfo userInfo = userService.getUserInfo(userId);
+        return ResponseEntity.ok(userInfo);
     }
 
 

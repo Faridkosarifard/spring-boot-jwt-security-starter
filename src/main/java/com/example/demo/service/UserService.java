@@ -1,5 +1,6 @@
 package com.example.demo.service;
 
+import com.example.demo.domain.dto.UserInfo;
 import com.example.demo.repository.PasswordResetTokenRepository;
 import com.example.demo.repository.RoleRepository;
 import com.example.demo.repository.UserRepository;
@@ -235,12 +236,24 @@ public class UserService implements IUserService, UserDetailsService {
         return user.getPhoneNumber() != null;
     }
 
+    private static UserInfo convertToUserInfo(User userById) {
+        return UserInfo.builder()
+                .id(userById.getId())
+                .username(userById.getUsername())
+                .firstName(userById.getFirstName())
+                .lastName(userById.getLastName())
+                .build();
+    }
+
     @Override
-    public User getUserInfo(User user) {
-        if (user.getId()!= null)
-            return userRepository.findUserById(user.getId());
-        else if (user.getUsername() != null) {
-            return userRepository.findByUsername(user.getUsername());
+    public UserInfo getUserInfo(String userId) {
+        User user;
+        if (userId.matches("\\d+")) {
+            user = userRepository.findUserById(Long.parseLong(userId));
+            return convertToUserInfo(user);
+        } else if (userId.matches("\\w+")) {
+            user = userRepository.findByUsername(userId);
+            return convertToUserInfo(user);
         }
         return null;
     }

@@ -1,5 +1,6 @@
 package com.example.demo.service;
 
+import com.example.demo.domain.dto.UserInfo;
 import com.example.demo.domain.model.PasswordResetToken;
 import com.example.demo.domain.model.User;
 import com.example.demo.domain.model.VerificationToken;
@@ -53,6 +54,5 @@ public interface IUserService {
 
     Boolean checkIfValidPhoneNumber(String phoneNumber);
 
-    User getUserInfo(User user);
-
+    UserInfo getUserInfo(String userId);
 }
