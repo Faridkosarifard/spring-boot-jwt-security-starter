@@ -4,14 +4,14 @@ import com.example.demo.domain.view.Views;
 import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonView;
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
+import lombok.*;
 import org.jboss.aerogear.security.otp.api.Base32;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.core.userdetails.UserDetails;
 
 import java.io.Serializable;
-import java.util.Collection;
-import java.util.Date;
+import java.util.*;
 
 /**
  * demo
@@ -24,7 +24,7 @@ import java.util.Date;
 @Data
 @Builder
 @AllArgsConstructor
-public class User implements Serializable {
+public class User implements Serializable, UserDetails {
     @Id
     @Column(unique = true, nullable = false)
     @GeneratedValue(strategy = GenerationType.AUTO)
@@ -78,8 +78,6 @@ public class User implements Serializable {
         this.secret = Base32.random();
         this.enabled = false;
     }
-
-
     @Override
     public boolean equals(final Object obj) {
         if (this == obj) {
@@ -115,4 +113,23 @@ public class User implements Serializable {
         return builder.toString();
     }
 
+    @Override
+    public Collection<? extends GrantedAuthority> getAuthorities() {
+        return List.of(new SimpleGrantedAuthority("ROLE_USER"));
+    }
+
+    @Override
+    public boolean isAccountNonExpired() {
+        return false;
+    }
+
+    @Override
+    public boolean isAccountNonLocked() {
+        return false;
+    }
+
+    @Override
+    public boolean isCredentialsNonExpired() {
+        return false;
+    }
 }

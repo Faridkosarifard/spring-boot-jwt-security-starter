@@ -18,11 +18,16 @@ import org.springframework.security.config.annotation.authentication.configurati
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.session.SessionRegistry;
 import org.springframework.security.core.session.SessionRegistryImpl;
 
+import org.springframework.security.core.userdetails.User;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.provisioning.InMemoryUserDetailsManager;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.web.cors.CorsConfiguration;
@@ -30,6 +35,7 @@ import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 import org.springframework.web.filter.CorsFilter;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
@@ -85,17 +91,14 @@ public class SecSecurityConfig {
         httpSecurity.cors(
                 Customizer.withDefaults())
                 .csrf(AbstractHttpConfigurer::disable)
-                .authorizeHttpRequests(authorize -> {
-                    authorize
-                            .requestMatchers("/api/**")
-                            .authenticated()
-                            .requestMatchers("/admin/**")
-                            .hasRole("ADMIN")
-                            .requestMatchers("/users/**")
-                            .hasRole("USER")
-                            .anyRequest().permitAll();
-
-                });
+                .authorizeHttpRequests(authorize -> authorize
+                        .requestMatchers("/api/**")
+                        .authenticated()
+                        .requestMatchers("/admin/**")
+                        .hasRole("ROLE_ADMIN")
+                        .requestMatchers("/users/**")
+                        .hasRole("ROLE_USER")
+                        .anyRequest().permitAll());
         httpSecurity.sessionManagement(manager -> manager.sessionCreationPolicy(STATELESS));
         return httpSecurity.build();
     }

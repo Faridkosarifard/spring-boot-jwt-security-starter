@@ -20,6 +20,7 @@ import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.annotation.security.RolesAllowed;
 import jakarta.mail.internet.MimeMessage;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.SneakyThrows;
@@ -207,6 +208,7 @@ public class RegistrationAPI {
     }
 
     @GetMapping("/get-info/{userId}")
+    @RolesAllowed("ROLE_ADMIN")
     public ResponseEntity<UserInfo> getUserInfo(@PathVariable String userId) {
         UserInfo userInfo = userService.getUserInfo(userId);
         return ResponseEntity.ok(userInfo);
