@@ -1,38 +1,78 @@
 server:
-  port: 8095
+  port: ${SERVER_PORT:8080}
+
 spring:
+  application:
+    name: jwt-security-starter
   datasource:
-    url: jdbc:oracle:thin:@localhost:1521/xe
-    driver-class-name: oracle.jdbc.driver.OracleDriver
-    username: REDACTED_USERNAME
-    password: REDACTED_PASSWORD
-  mail:
-    email: user@example.com
-    host: smtp.gmail.com
-    port: 465
-    protocol: smtps
-    username: REDACTED_USERNAME
-    password: REDACTED_PASSWORD
+    url: ${SPRING_DATASOURCE_URL:jdbc:postgresql://localhost:5432/jwtstarter}
+    username: ${SPRING_DATASOURCE_USERNAME:jwtstarter}
+    password: ${SPRING_DATASOURCE_PASSWORD:jwtstarter}
   jpa:
     hibernate:
-      ddl-auto: update
-
-    show-sql: true
-    database-platform: org.hibernate.dialect.Oracle12cDialect
-  main:
-    allow-bean-definition-overriding: true
-  profiles:
-    active: dev
-jwt:
-  secret-key: REDACTED_JWT_SECRET
-  issuer: http://localhost
-
-springdoc:
-  swagger-ui:
-    default-models-expand-depth: -1
+      ddl-auto: validate
+    open-in-view: false
+    properties:
+      hibernate:
+        jdbc:
+          time_zone: UTC
+  flyway:
+    enabled: true
+  mvc:
+    problemdetails:
+      enabled: true
+  mail:
+    host: ${SPRING_MAIL_HOST:}
+    port: ${SPRING_MAIL_PORT:1025}
+    username: ${SPRING_MAIL_USERNAME:}
+    password: ${SPRING_MAIL_PASSWORD:}
+    properties:
+      mail.smtp.auth: ${SPRING_MAIL_AUTH:false}
+      mail.smtp.starttls.enable: ${SPRING_MAIL_STARTTLS:false}
 
 management:
   endpoints:
     web:
-      cors:
-        allowed-origins: "*"
+      exposure:
+        include: health,info
+  endpoint:
+    health:
+      show-details: when_authorized
+  health:
+    mail:
+      enabled: ${APP_MAIL_HEALTH:false}
+
+springdoc:
+  api-docs:
+    path: /v3/api-docs
+  swagger-ui:
+    path: /swagger-ui.html
+
+app:
+  jwt:
+    secret: ${APP_JWT_SECRET}
+    issuer: ${APP_JWT_ISSUER:jwt-security-starter}
+    access-token-ttl: ${APP_JWT_ACCESS_TTL:15m}
+    refresh-token-ttl: ${APP_JWT_REFRESH_TTL:14d}
+  cors:
+    allowed-origins: ${APP_CORS_ALLOWED_ORIGINS:http://localhost:3000,http://localhost:8080}
+    allowed-methods: GET,POST,PUT,PATCH,DELETE,OPTIONS
+    allowed-headers: Authorization,Content-Type,Accept
+    allow-credentials: true
+  security:
+    max-failed-logins: ${APP_MAX_FAILED_LOGINS:5}
+    lockout-duration: ${APP_LOCKOUT_DURATION:15m}
+    login-rate-limit: ${APP_LOGIN_RATE_LIMIT:20}
+    login-rate-window: ${APP_LOGIN_RATE_WINDOW:15m}
+    email-verification-ttl: ${APP_EMAIL_VERIFICATION_TTL:24h}
+    password-reset-ttl: ${APP_PASSWORD_RESET_TTL:1h}
+  mail:
+    mode: ${APP_MAIL_MODE:logging}
+    from: ${APP_MAIL_FROM:noreply@localhost}
+    base-url: ${APP_BASE_URL:http://localhost:8080}
+  admin:
+    email: ${APP_ADMIN_EMAIL:}
+    username: ${APP_ADMIN_USERNAME:}
+    password: ${APP_ADMIN_PASSWORD:}
+    first-name: ${APP_ADMIN_FIRST_NAME:Admin}
+    last-name: ${APP_ADMIN_LAST_NAME:User}
